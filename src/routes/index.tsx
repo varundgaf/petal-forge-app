@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "AdProfitly — Enterprise Ad Monetization Platform" },
       {
         property: "og:description",
-        content: "Real-time revenue analytics, campaign management, and Adsterra integration.",
+        content: "Real-time revenue analytics, campaign management, and Adsterra integration for publishers and advertisers. Enterprise-grade AdTech in one console.",
       },
     ],
   }),
