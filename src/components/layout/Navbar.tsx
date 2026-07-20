@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, TrendingUp } from "lucide-react";
+import { Menu, X, TrendingUp, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,15 @@ const nav = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const status = useAuth((s) => s.status);
-  const user = useAuth((s) => s.user);
+  const profile = useAuth((s) => s.profile);
+  const signOut = useAuth((s) => s.signOut);
+
+  async function handleSignOut() {
+    await signOut();
+    navigate({ to: "/" });
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
@@ -41,13 +48,19 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          {status === "authenticated" && user ? (
+          {status === "authenticated" && profile ? (
             <>
               <span className="hidden text-sm text-muted-foreground lg:inline">
-                Hi, {user.name?.split(" ")[0] ?? user.email}
+                Hi, {profile.name?.split(" ")[0] ?? profile.email}
               </span>
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/">Console</Link>
+              <Button asChild size="sm" variant="hero">
+                <Link to="/dashboard">
+                  <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" />
               </Button>
             </>
           ) : (
@@ -89,12 +102,25 @@ export function Navbar() {
             </Link>
           ))}
           <div className="flex gap-2 pt-2">
-            <Button asChild variant="ghost" size="sm" className="flex-1">
-              <Link to="/login">Sign in</Link>
-            </Button>
-            <Button asChild size="sm" variant="hero" className="flex-1">
-              <Link to="/register">Get started</Link>
-            </Button>
+            {status === "authenticated" ? (
+              <>
+                <Button asChild size="sm" variant="hero" className="flex-1">
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild variant="ghost" size="sm" className="flex-1">
+                  <Link to="/login">Sign in</Link>
+                </Button>
+                <Button asChild size="sm" variant="hero" className="flex-1">
+                  <Link to="/register">Get started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useAuth, type UserRole } from "@/lib/auth-store";
+import { supabase } from "@/integrations/supabase/client";
+
+type UserRole = "publisher" | "advertiser";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -24,7 +26,6 @@ export const Route = createFileRoute("/register")({
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const register = useAuth((s) => s.register);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -42,13 +43,25 @@ function RegisterPage() {
     }
     setLoading(true);
     try {
-      const res = await register(form);
-      if (res.requiresVerification) {
-        toast.success("Check your email to verify your account.");
-        navigate({ to: "/verify-email", search: { email: form.email } });
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            name: form.name,
+            company: form.company,
+            role: form.role,
+          },
+        },
+      });
+      if (error) throw error;
+      if (data.session) {
+        toast.success("Account created. Welcome!");
+        navigate({ to: "/dashboard" });
       } else {
-        toast.success("Account created. Please sign in.");
-        navigate({ to: "/login" });
+        toast.success("Account created. Check your email to confirm.");
+        navigate({ to: "/verify-email", search: { email: form.email } });
       }
     } catch (err) {
       toast.error((err as Error).message);
