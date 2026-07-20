@@ -14,14 +14,15 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
 
-const links = [
+type NavLink = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const links: NavLink[] = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/dashboard/sites", label: "Sites", icon: Globe },
   { to: "/dashboard/ad-units", label: "Ad Units", icon: Layers },
   { to: "/dashboard/payments", label: "Payments", icon: Wallet },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
