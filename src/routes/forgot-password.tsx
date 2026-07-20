@@ -6,7 +6,7 @@ import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/auth-store";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPage,
@@ -19,7 +19,6 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function ForgotPage() {
-  const forgot = useAuth((s) => s.forgot);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,7 +27,10 @@ function ForgotPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await forgot(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
       setSent(true);
     } catch (err) {
       toast.error((err as Error).message);
@@ -55,8 +57,7 @@ function ForgotPage() {
         <div className="rounded-2xl border border-border bg-card p-6 text-center">
           <CheckCircle2 className="mx-auto h-10 w-10 text-primary" />
           <p className="mt-3 text-sm text-muted-foreground">
-            Reset link sent to <span className="font-medium text-foreground">{email}</span>. It
-            expires in 30 minutes.
+            Reset link sent to <span className="font-medium text-foreground">{email}</span>.
           </p>
         </div>
       ) : (

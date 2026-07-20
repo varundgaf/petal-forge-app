@@ -1,126 +1,77 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { api, tokens, apiError } from "./api";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export type UserRole = "admin" | "publisher" | "advertiser";
 
-export interface AuthUser {
+export interface Profile {
   id: string;
   email: string;
-  name?: string;
-  role: UserRole;
-  emailVerified?: boolean;
-  twoFactorEnabled?: boolean;
-  avatarUrl?: string;
+  name: string | null;
+  company: string | null;
+  avatar_url: string | null;
+  kyc_status: "unverified" | "pending" | "verified" | "rejected";
+  two_factor_enabled: boolean;
 }
 
 interface AuthState {
-  user: AuthUser | null;
+  user: User | null;
+  profile: Profile | null;
+  role: UserRole | null;
   status: "idle" | "loading" | "authenticated" | "unauthenticated";
-  error: string | null;
-  hydrate: () => Promise<void>;
-  login: (email: string, password: string, code?: string) => Promise<AuthUser>;
-  register: (input: RegisterInput) => Promise<{ requiresVerification: boolean }>;
-  logout: () => Promise<void>;
-  forgot: (email: string) => Promise<void>;
-  reset: (token: string, password: string) => Promise<void>;
-  clearError: () => void;
+  init: () => Promise<() => void>;
+  refresh: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-export interface RegisterInput {
-  email: string;
-  password: string;
-  name: string;
-  role: UserRole;
-  company?: string;
+async function loadProfile(userId: string): Promise<{ profile: Profile | null; role: UserRole | null }> {
+  const [{ data: profile }, { data: roles }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+    supabase.from("user_roles").select("role").eq("user_id", userId).limit(1),
+  ]);
+  return {
+    profile: (profile as Profile) ?? null,
+    role: (roles?.[0]?.role as UserRole) ?? null,
+  };
 }
 
-export const useAuth = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      user: null,
-      status: "idle",
-      error: null,
-      clearError: () => set({ error: null }),
+export const useAuth = create<AuthState>((set, get) => ({
+  user: null,
+  profile: null,
+  role: null,
+  status: "idle",
 
-      hydrate: async () => {
-        if (!tokens.access) {
-          set({ status: "unauthenticated" });
-          return;
-        }
-        try {
-          const { data } = await api.get("/auth/me");
-          set({ user: data.user ?? data, status: "authenticated" });
-        } catch {
-          tokens.clear();
-          set({ user: null, status: "unauthenticated" });
-        }
-      },
-
-      login: async (email, password, code) => {
-        set({ status: "loading", error: null });
-        try {
-          const { data } = await api.post("/auth/login", { email, password, code });
-          const access = data.accessToken ?? data.access_token;
-          const refresh = data.refreshToken ?? data.refresh_token;
-          if (!access) throw new Error("No access token in response");
-          tokens.set(access, refresh);
-          const user: AuthUser = data.user ?? (await api.get("/auth/me")).data;
-          set({ user, status: "authenticated" });
-          return user;
-        } catch (e) {
-          const msg = apiError(e);
-          set({ status: "unauthenticated", error: msg });
-          throw new Error(msg);
-        }
-      },
-
-      register: async (input) => {
-        set({ status: "loading", error: null });
-        try {
-          const { data } = await api.post("/auth/register", input);
-          set({ status: "unauthenticated" });
-          return { requiresVerification: !!data?.requiresVerification };
-        } catch (e) {
-          const msg = apiError(e);
-          set({ status: "unauthenticated", error: msg });
-          throw new Error(msg);
-        }
-      },
-
-      logout: async () => {
-        try {
-          await api.post("/auth/logout");
-        } catch {
-          /* ignore */
-        }
-        tokens.clear();
-        set({ user: null, status: "unauthenticated" });
-      },
-
-      forgot: async (email) => {
-        try {
-          await api.post("/auth/forgot-password", { email });
-        } catch (e) {
-          throw new Error(apiError(e));
-        }
-      },
-
-      reset: async (token, password) => {
-        try {
-          await api.post("/auth/reset-password", { token, password });
-        } catch (e) {
-          throw new Error(apiError(e));
-        }
-      },
-    }),
-    {
-      name: "adp-auth",
-      partialize: (s) => ({ user: s.user }),
+  init: async () => {
+    set({ status: "loading" });
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.user) {
+      const { profile, role } = await loadProfile(data.session.user.id);
+      set({ user: data.session.user, profile, role, status: "authenticated" });
+    } else {
+      set({ user: null, profile: null, role: null, status: "unauthenticated" });
     }
-  )
-);
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        set({ user: null, profile: null, role: null, status: "unauthenticated" });
+        return;
+      }
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        const { profile, role } = await loadProfile(session.user.id);
+        set({ user: session.user, profile, role, status: "authenticated" });
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  },
 
-export function isAuthed() {
-  return useAuth.getState().status === "authenticated";
-}
+  refresh: async () => {
+    const u = get().user;
+    if (!u) return;
+    const { profile, role } = await loadProfile(u.id);
+    set({ profile, role });
+  },
+
+  signOut: async () => {
+    await supabase.auth.signOut();
+    set({ user: null, profile: null, role: null, status: "unauthenticated" });
+  },
+}));

@@ -96,8 +96,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@adprofitly" },
       { name: "twitter:title", content: "AdProfitly — Enterprise Ad Monetization Platform" },
       { name: "twitter:description", content: "Real-time revenue analytics, campaign management, and Adsterra integration for publishers and advertisers. Enterprise-grade AdTech in one console." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6c0a238a-4287-4943-8ab4-f0d9e6a86b0f/id-preview-9a16826a--49982f3a-c5d4-4fc8-8d32-5a550c369326.lovable.app-1783934988494.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6c0a238a-4287-4943-8ab4-f0d9e6a86b0f/id-preview-9a16826a--49982f3a-c5d4-4fc8-8d32-5a550c369326.lovable.app-1783934988494.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -131,10 +129,14 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function AuthHydrator() {
-  const hydrate = useAuth((s) => s.hydrate);
+  const init = useAuth((s) => s.init);
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    let cleanup: (() => void) | undefined;
+    init().then((c) => {
+      cleanup = c;
+    });
+    return () => cleanup?.();
+  }, [init]);
   return null;
 }
 

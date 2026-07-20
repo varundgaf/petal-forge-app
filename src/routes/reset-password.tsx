@@ -1,21 +1,14 @@
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/auth-store";
-
-interface ResetSearch {
-  token?: string;
-}
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
   component: ResetPage,
-  validateSearch: (s: Record<string, unknown>): ResetSearch => ({
-    token: typeof s.token === "string" ? s.token : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "Set a new password — AdProfitly" },
@@ -25,19 +18,13 @@ export const Route = createFileRoute("/reset-password")({
 });
 
 function ResetPage() {
-  const { token } = useSearch({ from: "/reset-password" });
   const navigate = useNavigate();
-  const reset = useAuth((s) => s.reset);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) {
-      toast.error("Reset link is missing or invalid.");
-      return;
-    }
     if (password.length < 8) {
       toast.error("Password must be at least 8 characters.");
       return;
@@ -48,9 +35,10 @@ function ResetPage() {
     }
     setLoading(true);
     try {
-      await reset(token, password);
-      toast.success("Password updated. Please sign in.");
-      navigate({ to: "/login" });
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      toast.success("Password updated.");
+      navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
