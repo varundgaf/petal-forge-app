@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          detail: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ad_units: {
         Row: {
           adsterra_zone_id: string | null
@@ -61,6 +85,36 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -70,6 +124,7 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_method"]
           notes: string | null
           paid_at: string | null
+          reference_id: string | null
           requested_at: string
           status: Database["public"]["Enums"]["payment_status"]
           tx_hash: string | null
@@ -84,6 +139,7 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           paid_at?: string | null
+          reference_id?: string | null
           requested_at?: string
           status?: Database["public"]["Enums"]["payment_status"]
           tx_hash?: string | null
@@ -98,6 +154,7 @@ export type Database = {
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           paid_at?: string | null
+          reference_id?: string | null
           requested_at?: string
           status?: Database["public"]["Enums"]["payment_status"]
           tx_hash?: string | null
@@ -110,35 +167,59 @@ export type Database = {
         Row: {
           avatar_url: string | null
           company: string | null
+          country: string | null
           created_at: string
+          discord: string | null
           email: string
           id: string
           kyc_status: Database["public"]["Enums"]["kyc_status"]
           name: string | null
+          payment_email: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          publisher_id: string | null
+          telegram: string | null
+          timezone: string | null
           two_factor_enabled: boolean
           updated_at: string
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
           company?: string | null
+          country?: string | null
           created_at?: string
+          discord?: string | null
           email: string
           id: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           name?: string | null
+          payment_email?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          publisher_id?: string | null
+          telegram?: string | null
+          timezone?: string | null
           two_factor_enabled?: boolean
           updated_at?: string
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
           company?: string | null
+          country?: string | null
           created_at?: string
+          discord?: string | null
           email?: string
           id?: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           name?: string | null
+          payment_email?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          publisher_id?: string | null
+          telegram?: string | null
+          timezone?: string | null
           two_factor_enabled?: boolean
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -282,7 +363,13 @@ export type Database = {
         | "crypto_btc"
         | "crypto_usdt"
         | "payoneer"
-      payment_status: "pending" | "processing" | "paid" | "failed"
+      payment_status:
+        | "pending"
+        | "processing"
+        | "paid"
+        | "failed"
+        | "approved"
+        | "rejected"
       site_status: "pending" | "active" | "paused" | "rejected"
     }
     CompositeTypes: {
@@ -428,7 +515,14 @@ export const Constants = {
         "crypto_usdt",
         "payoneer",
       ],
-      payment_status: ["pending", "processing", "paid", "failed"],
+      payment_status: [
+        "pending",
+        "processing",
+        "paid",
+        "failed",
+        "approved",
+        "rejected",
+      ],
       site_status: ["pending", "active", "paused", "rejected"],
     },
   },
