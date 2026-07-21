@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 export type UserRole = "admin" | "publisher" | "advertiser";
+export type PaymentMethod = "paypal" | "wire" | "crypto_btc" | "crypto_usdt" | "payoneer";
 
 export interface Profile {
   id: string;
@@ -12,6 +13,14 @@ export interface Profile {
   avatar_url: string | null;
   kyc_status: "unverified" | "pending" | "verified" | "rejected";
   two_factor_enabled: boolean;
+  publisher_id: string | null;
+  website: string | null;
+  country: string | null;
+  timezone: string | null;
+  telegram: string | null;
+  discord: string | null;
+  payment_method: PaymentMethod | null;
+  payment_email: string | null;
 }
 
 interface AuthState {
