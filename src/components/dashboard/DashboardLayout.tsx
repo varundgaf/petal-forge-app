@@ -74,7 +74,12 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{profile?.name ?? profile?.email}</p>
-              <p className="truncate text-xs capitalize text-muted-foreground">{role ?? "—"}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                <span className="capitalize">{role ?? "—"}</span>
+                {profile?.publisher_id && (
+                  <span className="ml-1 font-mono">· {profile.publisher_id}</span>
+                )}
+              </p>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="w-full justify-start" onClick={handleSignOut}>
