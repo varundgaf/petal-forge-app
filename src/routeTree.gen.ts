@@ -26,11 +26,17 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
+import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites'
+import { Route as AdminGatedPaymentsRouteImport } from './routes/admin/_gated/payments'
+import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
+import { Route as AdminGatedAuditRouteImport } from './routes/admin/_gated/audit'
 import { Route as AuthenticatedDashboardSitesRouteImport } from './routes/_authenticated/dashboard.sites'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardPaymentsRouteImport } from './routes/_authenticated/dashboard.payments'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
 import { Route as AuthenticatedDashboardAdUnitsRouteImport } from './routes/_authenticated/dashboard.ad-units'
+import { Route as AdminGatedUsersUserIdRouteImport } from './routes/admin/_gated/users.$userId'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -116,6 +122,31 @@ const AuthenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedSitesRoute = AdminGatedSitesRouteImport.update({
+  id: '/sites',
+  path: '/sites',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedPaymentsRoute = AdminGatedPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedAuditRoute = AdminGatedAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AuthenticatedDashboardSitesRoute =
   AuthenticatedDashboardSitesRouteImport.update({
     id: '/sites',
@@ -146,6 +177,11 @@ const AuthenticatedDashboardAdUnitsRoute =
     path: '/ad-units',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AdminGatedUsersUserIdRoute = AdminGatedUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminGatedUsersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -167,7 +203,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
+  '/admin/audit': typeof AdminGatedAuditRoute
+  '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/payments': typeof AdminGatedPaymentsRoute
+  '/admin/sites': typeof AdminGatedSitesRoute
+  '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -187,7 +229,13 @@ export interface FileRoutesByTo {
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
+  '/admin/audit': typeof AdminGatedAuditRoute
+  '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/payments': typeof AdminGatedPaymentsRoute
+  '/admin/sites': typeof AdminGatedSitesRoute
+  '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,7 +251,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/admin/_gated': typeof AdminGatedRouteRoute
+  '/admin/_gated': typeof AdminGatedRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -212,7 +260,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
+  '/admin/_gated/audit': typeof AdminGatedAuditRoute
+  '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/_gated/payments': typeof AdminGatedPaymentsRoute
+  '/admin/_gated/sites': typeof AdminGatedSitesRoute
+  '/admin/_gated/users': typeof AdminGatedUsersRouteWithChildren
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/admin/_gated/users/$userId': typeof AdminGatedUsersUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -236,7 +290,13 @@ export interface FileRouteTypes {
     | '/dashboard/payments'
     | '/dashboard/settings'
     | '/dashboard/sites'
+    | '/admin/audit'
+    | '/admin/dashboard'
+    | '/admin/payments'
+    | '/admin/sites'
+    | '/admin/users'
     | '/dashboard/'
+    | '/admin/users/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -256,7 +316,13 @@ export interface FileRouteTypes {
     | '/dashboard/payments'
     | '/dashboard/settings'
     | '/dashboard/sites'
+    | '/admin/audit'
+    | '/admin/dashboard'
+    | '/admin/payments'
+    | '/admin/sites'
+    | '/admin/users'
     | '/dashboard'
+    | '/admin/users/$userId'
   id:
     | '__root__'
     | '/'
@@ -280,7 +346,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/payments'
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/sites'
+    | '/admin/_gated/audit'
+    | '/admin/_gated/dashboard'
+    | '/admin/_gated/payments'
+    | '/admin/_gated/sites'
+    | '/admin/_gated/users'
     | '/_authenticated/dashboard/'
+    | '/admin/_gated/users/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -419,6 +491,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/admin/_gated/users': {
+      id: '/admin/_gated/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminGatedUsersRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/sites': {
+      id: '/admin/_gated/sites'
+      path: '/sites'
+      fullPath: '/admin/sites'
+      preLoaderRoute: typeof AdminGatedSitesRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/payments': {
+      id: '/admin/_gated/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminGatedPaymentsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/dashboard': {
+      id: '/admin/_gated/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminGatedDashboardRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/audit': {
+      id: '/admin/_gated/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminGatedAuditRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/_authenticated/dashboard/sites': {
       id: '/_authenticated/dashboard/sites'
       path: '/sites'
@@ -453,6 +560,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/ad-units'
       preLoaderRoute: typeof AuthenticatedDashboardAdUnitsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/admin/_gated/users/$userId': {
+      id: '/admin/_gated/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminGatedUsersUserIdRouteImport
+      parentRoute: typeof AdminGatedUsersRoute
     }
   }
 }
@@ -492,14 +606,46 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminGatedUsersRouteChildren {
+  AdminGatedUsersUserIdRoute: typeof AdminGatedUsersUserIdRoute
+}
+
+const AdminGatedUsersRouteChildren: AdminGatedUsersRouteChildren = {
+  AdminGatedUsersUserIdRoute: AdminGatedUsersUserIdRoute,
+}
+
+const AdminGatedUsersRouteWithChildren = AdminGatedUsersRoute._addFileChildren(
+  AdminGatedUsersRouteChildren,
+)
+
+interface AdminGatedRouteRouteChildren {
+  AdminGatedAuditRoute: typeof AdminGatedAuditRoute
+  AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
+  AdminGatedPaymentsRoute: typeof AdminGatedPaymentsRoute
+  AdminGatedSitesRoute: typeof AdminGatedSitesRoute
+  AdminGatedUsersRoute: typeof AdminGatedUsersRouteWithChildren
+}
+
+const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
+  AdminGatedAuditRoute: AdminGatedAuditRoute,
+  AdminGatedDashboardRoute: AdminGatedDashboardRoute,
+  AdminGatedPaymentsRoute: AdminGatedPaymentsRoute,
+  AdminGatedSitesRoute: AdminGatedSitesRoute,
+  AdminGatedUsersRoute: AdminGatedUsersRouteWithChildren,
+}
+
+const AdminGatedRouteRouteWithChildren = AdminGatedRouteRoute._addFileChildren(
+  AdminGatedRouteRouteChildren,
+)
+
 interface AdminRouteRouteChildren {
-  AdminGatedRouteRoute: typeof AdminGatedRouteRoute
+  AdminGatedRouteRoute: typeof AdminGatedRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminGatedRouteRoute: AdminGatedRouteRoute,
+  AdminGatedRouteRoute: AdminGatedRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
