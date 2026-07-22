@@ -193,10 +193,10 @@ export const updateUser = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch = Object.fromEntries(
+    const patch: Record<string, unknown> = Object.fromEntries(
       Object.entries(data.patch).filter(([, v]) => v !== undefined && v !== null && v !== ""),
     );
-    const { error } = await supabaseAdmin.from("profiles").update(patch).eq("id", data.userId);
+    const { error } = await supabaseAdmin.from("profiles").update(patch as any).eq("id", data.userId);
     if (error) throw new Error(error.message);
     await logAction(context.userId, "user.update", "user", data.userId, patch);
     return { ok: true };

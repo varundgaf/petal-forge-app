@@ -18,9 +18,13 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardSitesRouteImport } from './routes/_authenticated/dashboard.sites'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -73,6 +77,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -82,10 +91,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AdminGatedRouteRoute = AdminGatedRouteRouteImport.update({
+  id: '/_gated',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
@@ -126,6 +149,7 @@ const AuthenticatedDashboardAdUnitsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
@@ -136,6 +160,8 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/ad-units': typeof AuthenticatedDashboardAdUnitsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
@@ -154,6 +180,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/login': typeof AdminLoginRoute
   '/dashboard/ad-units': typeof AuthenticatedDashboardAdUnitsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
@@ -165,6 +193,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
@@ -174,7 +203,10 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/_gated': typeof AdminGatedRouteRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/': typeof AdminIndexRoute
   '/_authenticated/dashboard/ad-units': typeof AuthenticatedDashboardAdUnitsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
@@ -186,6 +218,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/about'
     | '/contact'
     | '/features'
@@ -196,6 +229,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/dashboard'
+    | '/admin/login'
+    | '/admin/'
     | '/dashboard/ad-units'
     | '/dashboard/analytics'
     | '/dashboard/payments'
@@ -214,6 +249,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/verify-email'
+    | '/admin'
+    | '/admin/login'
     | '/dashboard/ad-units'
     | '/dashboard/analytics'
     | '/dashboard/payments'
@@ -224,6 +261,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/about'
     | '/contact'
     | '/features'
@@ -233,7 +271,10 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/verify-email'
+    | '/admin/_gated'
     | '/_authenticated/dashboard'
+    | '/admin/login'
+    | '/admin/'
     | '/_authenticated/dashboard/ad-units'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/payments'
@@ -245,6 +286,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
@@ -321,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -335,12 +384,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/admin/_gated': {
+      id: '/admin/_gated'
+      path: ''
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminGatedRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
@@ -422,9 +492,26 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminRouteRouteChildren {
+  AdminGatedRouteRoute: typeof AdminGatedRouteRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminGatedRouteRoute: AdminGatedRouteRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
@@ -438,3 +525,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
