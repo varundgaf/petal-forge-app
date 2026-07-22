@@ -85,6 +85,42 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          ip: string | null
+          meta: Json | null
+          target_id: string | null
+          target_type: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          ip?: string | null
+          meta?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          ip?: string | null
+          meta?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -165,6 +201,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_notes: string | null
           avatar_url: string | null
           company: string | null
           country: string | null
@@ -173,10 +210,14 @@ export type Database = {
           email: string
           id: string
           kyc_status: Database["public"]["Enums"]["kyc_status"]
+          min_payout: number
           name: string | null
           payment_email: string | null
           payment_method: Database["public"]["Enums"]["payment_method"] | null
+          phone: string | null
           publisher_id: string | null
+          revenue_share: number
+          status: Database["public"]["Enums"]["profile_status"]
           telegram: string | null
           timezone: string | null
           two_factor_enabled: boolean
@@ -184,6 +225,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          admin_notes?: string | null
           avatar_url?: string | null
           company?: string | null
           country?: string | null
@@ -192,10 +234,14 @@ export type Database = {
           email: string
           id: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          min_payout?: number
           name?: string | null
           payment_email?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          phone?: string | null
           publisher_id?: string | null
+          revenue_share?: number
+          status?: Database["public"]["Enums"]["profile_status"]
           telegram?: string | null
           timezone?: string | null
           two_factor_enabled?: boolean
@@ -203,6 +249,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          admin_notes?: string | null
           avatar_url?: string | null
           company?: string | null
           country?: string | null
@@ -211,10 +258,14 @@ export type Database = {
           email?: string
           id?: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          min_payout?: number
           name?: string | null
           payment_email?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          phone?: string | null
           publisher_id?: string | null
+          revenue_share?: number
+          status?: Database["public"]["Enums"]["profile_status"]
           telegram?: string | null
           timezone?: string | null
           two_factor_enabled?: boolean
@@ -370,6 +421,7 @@ export type Database = {
         | "failed"
         | "approved"
         | "rejected"
+      profile_status: "active" | "suspended" | "banned"
       site_status: "pending" | "active" | "paused" | "rejected"
     }
     CompositeTypes: {
@@ -523,6 +575,7 @@ export const Constants = {
         "approved",
         "rejected",
       ],
+      profile_status: ["active", "suspended", "banned"],
       site_status: ["pending", "active", "paused", "rejected"],
     },
   },
