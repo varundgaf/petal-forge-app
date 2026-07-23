@@ -28,6 +28,7 @@ import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
 import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites'
+import { Route as AdminGatedSearchRouteImport } from './routes/admin/_gated/search'
 import { Route as AdminGatedPaymentsRouteImport } from './routes/admin/_gated/payments'
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
 import { Route as AdminGatedAuditRouteImport } from './routes/admin/_gated/audit'
@@ -134,6 +135,11 @@ const AdminGatedSitesRoute = AdminGatedSitesRouteImport.update({
   path: '/sites',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedSearchRoute = AdminGatedSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedPaymentsRoute = AdminGatedPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminGatedAuditRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
   '/admin/payments': typeof AdminGatedPaymentsRoute
+  '/admin/search': typeof AdminGatedSearchRoute
   '/admin/sites': typeof AdminGatedSitesRoute
   '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -246,6 +253,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminGatedAuditRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
   '/admin/payments': typeof AdminGatedPaymentsRoute
+  '/admin/search': typeof AdminGatedSearchRoute
   '/admin/sites': typeof AdminGatedSitesRoute
   '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -279,6 +287,7 @@ export interface FileRoutesById {
   '/admin/_gated/audit': typeof AdminGatedAuditRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
   '/admin/_gated/payments': typeof AdminGatedPaymentsRoute
+  '/admin/_gated/search': typeof AdminGatedSearchRoute
   '/admin/_gated/sites': typeof AdminGatedSitesRoute
   '/admin/_gated/users': typeof AdminGatedUsersRouteWithChildren
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/payments'
+    | '/admin/search'
     | '/admin/sites'
     | '/admin/users'
     | '/dashboard/'
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/dashboard'
     | '/admin/payments'
+    | '/admin/search'
     | '/admin/sites'
     | '/admin/users'
     | '/dashboard'
@@ -371,6 +382,7 @@ export interface FileRouteTypes {
     | '/admin/_gated/audit'
     | '/admin/_gated/dashboard'
     | '/admin/_gated/payments'
+    | '/admin/_gated/search'
     | '/admin/_gated/sites'
     | '/admin/_gated/users'
     | '/_authenticated/dashboard/'
@@ -531,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedSitesRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/search': {
+      id: '/admin/_gated/search'
+      path: '/search'
+      fullPath: '/admin/search'
+      preLoaderRoute: typeof AdminGatedSearchRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/payments': {
       id: '/admin/_gated/payments'
       path: '/payments'
@@ -662,6 +681,7 @@ interface AdminGatedRouteRouteChildren {
   AdminGatedAuditRoute: typeof AdminGatedAuditRoute
   AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
   AdminGatedPaymentsRoute: typeof AdminGatedPaymentsRoute
+  AdminGatedSearchRoute: typeof AdminGatedSearchRoute
   AdminGatedSitesRoute: typeof AdminGatedSitesRoute
   AdminGatedUsersRoute: typeof AdminGatedUsersRouteWithChildren
 }
@@ -670,6 +690,7 @@ const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedAuditRoute: AdminGatedAuditRoute,
   AdminGatedDashboardRoute: AdminGatedDashboardRoute,
   AdminGatedPaymentsRoute: AdminGatedPaymentsRoute,
+  AdminGatedSearchRoute: AdminGatedSearchRoute,
   AdminGatedSitesRoute: AdminGatedSitesRoute,
   AdminGatedUsersRoute: AdminGatedUsersRouteWithChildren,
 }
