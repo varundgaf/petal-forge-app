@@ -55,9 +55,15 @@ function StatCard({
 
 function Dashboard() {
   const fn = useServerFn(getAdminStats);
+  const extrasFn = useServerFn(getDashboardExtras);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "stats"],
     queryFn: () => fn(),
+    refetchInterval: 30000,
+  });
+  const { data: extras } = useQuery({
+    queryKey: ["admin", "extras"],
+    queryFn: () => extrasFn(),
     refetchInterval: 30000,
   });
 
