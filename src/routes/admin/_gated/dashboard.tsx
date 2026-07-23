@@ -115,6 +115,8 @@ function Dashboard() {
           icon={CheckCircle2}
           accent="bg-emerald-500/10 text-emerald-500"
         />
+        <StatCard label="Suspended Publishers" value={fmt(extras?.suspendedPublishers)} icon={UserMinus} accent="bg-amber-500/10 text-amber-500" />
+        <StatCard label="Open Support Tickets" value={fmt(extras?.openTickets)} icon={LifeBuoy} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -122,6 +124,58 @@ function Dashboard() {
         <StatCard label="Monthly Revenue" value={money(data?.monthRevenue)} icon={DollarSign} />
         <StatCard label="Total Revenue" value={money(data?.totalRevenue)} icon={DollarSign} />
       </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="border-border/60 bg-card/40 p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Recent activity</h2>
+          </div>
+          <ul className="space-y-2 text-sm">
+            {(extras?.recentActivity ?? []).map((a: any) => (
+              <li key={a.id} className="flex items-start justify-between gap-3">
+                <span>
+                  <span className="font-medium">{a.action}</span>
+                  {a.detail ? <span className="text-muted-foreground"> — {a.detail}</span> : null}
+                </span>
+                <span className="whitespace-nowrap text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString()}</span>
+              </li>
+            ))}
+            {!extras?.recentActivity?.length && <li className="text-xs text-muted-foreground">No activity recorded.</li>}
+          </ul>
+        </Card>
+        <Card className="border-border/60 bg-card/40 p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <UsersIcon className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Latest registrations</h2>
+          </div>
+          <ul className="space-y-2 text-sm">
+            {(extras?.latestUsers ?? []).map((u: any) => (
+              <li key={u.id} className="flex items-center justify-between">
+                <Link to="/admin/users/$userId" params={{ userId: u.id }} className="hover:text-primary">
+                  {u.name ?? u.email}
+                  <span className="ml-1 text-xs text-muted-foreground">({u.publisher_id})</span>
+                </Link>
+                <span className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</span>
+              </li>
+            ))}
+            {!extras?.latestUsers?.length && <li className="text-xs text-muted-foreground">No users yet.</li>}
+          </ul>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="border-border/60 bg-card/40 p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">System status</h2>
+          </div>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center justify-between"><span className="text-muted-foreground">Database</span><span className="flex items-center gap-1.5 text-emerald-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational</span></li>
+            <li className="flex items-center justify-between"><span className="text-muted-foreground">Auth service</span><span className="flex items-center gap-1.5 text-emerald-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational</span></li>
+            <li className="flex items-center justify-between"><span className="text-muted-foreground">Server functions</span><span className="flex items-center gap-1.5 text-emerald-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational</span></li>
+          </ul>
+        </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="border-border/60 bg-card/40 p-5">
