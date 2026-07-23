@@ -605,7 +605,7 @@ export const listTickets = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("support_tickets")
-      .select("*, profiles(email,name,publisher_id)")
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(200);
     if (data.status) q = q.eq("status", data.status);
@@ -613,7 +613,14 @@ export const listTickets = createServerFn({ method: "POST" })
     if (data.search) q = q.ilike("subject", `%${data.search}%`);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const ids = Array.from(new Set((rows ?? []).map((r: any) => r.user_id)));
+    let profilesMap: Record<string, any> = {};
+    if (ids.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles").select("id,email,name,publisher_id").in("id", ids);
+      profilesMap = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p]));
+    }
+    return (rows ?? []).map((r: any) => ({ ...r, profiles: profilesMap[r.user_id] ?? null }));
   });
 
 export const getTicket = createServerFn({ method: "POST" })
@@ -623,11 +630,20 @@ export const getTicket = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [ticket, messages] = await Promise.all([
-      supabaseAdmin.from("support_tickets").select("*, profiles(email,name,publisher_id)").eq("id", data.id).maybeSingle(),
+      supabaseAdmin.from("support_tickets").select("*").eq("id", data.id).maybeSingle(),
       supabaseAdmin.from("ticket_messages").select("*").eq("ticket_id", data.id).order("created_at"),
     ]);
     if (ticket.error) throw new Error(ticket.error.message);
-    return { ticket: ticket.data, messages: messages.data ?? [] };
+    let profile: any = null;
+    if (ticket.data) {
+      const { data: prof } = await supabaseAdmin
+        .from("profiles").select("id,email,name,publisher_id").eq("id", ticket.data.user_id).maybeSingle();
+      profile = prof;
+    }
+    return {
+      ticket: ticket.data ? { ...ticket.data, profiles: profile } : null,
+      messages: messages.data ?? [],
+    };
   });
 
 export const updateTicket = createServerFn({ method: "POST" })
