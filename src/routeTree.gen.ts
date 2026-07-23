@@ -27,10 +27,15 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
+import { Route as AdminGatedSupportRouteImport } from './routes/admin/_gated/support'
 import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites'
+import { Route as AdminGatedSettingsRouteImport } from './routes/admin/_gated/settings'
 import { Route as AdminGatedSearchRouteImport } from './routes/admin/_gated/search'
+import { Route as AdminGatedReportsRouteImport } from './routes/admin/_gated/reports'
 import { Route as AdminGatedPaymentsRouteImport } from './routes/admin/_gated/payments'
+import { Route as AdminGatedNotificationsRouteImport } from './routes/admin/_gated/notifications'
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
+import { Route as AdminGatedCmsRouteImport } from './routes/admin/_gated/cms'
 import { Route as AdminGatedAuditRouteImport } from './routes/admin/_gated/audit'
 import { Route as AuthenticatedDashboardSitesRouteImport } from './routes/_authenticated/dashboard.sites'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -130,9 +135,19 @@ const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedSupportRoute = AdminGatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedSitesRoute = AdminGatedSitesRouteImport.update({
   id: '/sites',
   path: '/sites',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedSettingsRoute = AdminGatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
 const AdminGatedSearchRoute = AdminGatedSearchRouteImport.update({
@@ -140,14 +155,29 @@ const AdminGatedSearchRoute = AdminGatedSearchRouteImport.update({
   path: '/search',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedReportsRoute = AdminGatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedPaymentsRoute = AdminGatedPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedNotificationsRoute = AdminGatedNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedCmsRoute = AdminGatedCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
 const AdminGatedAuditRoute = AdminGatedAuditRouteImport.update({
@@ -222,10 +252,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
   '/admin/audit': typeof AdminGatedAuditRoute
+  '/admin/cms': typeof AdminGatedCmsRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/notifications': typeof AdminGatedNotificationsRoute
   '/admin/payments': typeof AdminGatedPaymentsRoute
+  '/admin/reports': typeof AdminGatedReportsRoute
   '/admin/search': typeof AdminGatedSearchRoute
+  '/admin/settings': typeof AdminGatedSettingsRoute
   '/admin/sites': typeof AdminGatedSitesRoute
+  '/admin/support': typeof AdminGatedSupportRoute
   '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
@@ -251,10 +286,15 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
   '/admin/audit': typeof AdminGatedAuditRoute
+  '/admin/cms': typeof AdminGatedCmsRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/notifications': typeof AdminGatedNotificationsRoute
   '/admin/payments': typeof AdminGatedPaymentsRoute
+  '/admin/reports': typeof AdminGatedReportsRoute
   '/admin/search': typeof AdminGatedSearchRoute
+  '/admin/settings': typeof AdminGatedSettingsRoute
   '/admin/sites': typeof AdminGatedSitesRoute
+  '/admin/support': typeof AdminGatedSupportRoute
   '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
@@ -285,10 +325,15 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
   '/admin/_gated/audit': typeof AdminGatedAuditRoute
+  '/admin/_gated/cms': typeof AdminGatedCmsRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/_gated/notifications': typeof AdminGatedNotificationsRoute
   '/admin/_gated/payments': typeof AdminGatedPaymentsRoute
+  '/admin/_gated/reports': typeof AdminGatedReportsRoute
   '/admin/_gated/search': typeof AdminGatedSearchRoute
+  '/admin/_gated/settings': typeof AdminGatedSettingsRoute
   '/admin/_gated/sites': typeof AdminGatedSitesRoute
+  '/admin/_gated/support': typeof AdminGatedSupportRoute
   '/admin/_gated/users': typeof AdminGatedUsersRouteWithChildren
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/admin/_gated/users/$userId': typeof AdminGatedUsersUserIdRoute
@@ -318,10 +363,15 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/sites'
     | '/admin/audit'
+    | '/admin/cms'
     | '/admin/dashboard'
+    | '/admin/notifications'
     | '/admin/payments'
+    | '/admin/reports'
     | '/admin/search'
+    | '/admin/settings'
     | '/admin/sites'
+    | '/admin/support'
     | '/admin/users'
     | '/dashboard/'
     | '/admin/users/$userId'
@@ -347,10 +397,15 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/sites'
     | '/admin/audit'
+    | '/admin/cms'
     | '/admin/dashboard'
+    | '/admin/notifications'
     | '/admin/payments'
+    | '/admin/reports'
     | '/admin/search'
+    | '/admin/settings'
     | '/admin/sites'
+    | '/admin/support'
     | '/admin/users'
     | '/dashboard'
     | '/admin/users/$userId'
@@ -380,10 +435,15 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/sites'
     | '/admin/_gated/audit'
+    | '/admin/_gated/cms'
     | '/admin/_gated/dashboard'
+    | '/admin/_gated/notifications'
     | '/admin/_gated/payments'
+    | '/admin/_gated/reports'
     | '/admin/_gated/search'
+    | '/admin/_gated/settings'
     | '/admin/_gated/sites'
+    | '/admin/_gated/support'
     | '/admin/_gated/users'
     | '/_authenticated/dashboard/'
     | '/admin/_gated/users/$userId'
@@ -536,11 +596,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedUsersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/support': {
+      id: '/admin/_gated/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminGatedSupportRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/sites': {
       id: '/admin/_gated/sites'
       path: '/sites'
       fullPath: '/admin/sites'
       preLoaderRoute: typeof AdminGatedSitesRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/settings': {
+      id: '/admin/_gated/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminGatedSettingsRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
     '/admin/_gated/search': {
@@ -550,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedSearchRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/reports': {
+      id: '/admin/_gated/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminGatedReportsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/payments': {
       id: '/admin/_gated/payments'
       path: '/payments'
@@ -557,11 +638,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedPaymentsRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/notifications': {
+      id: '/admin/_gated/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminGatedNotificationsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/dashboard': {
       id: '/admin/_gated/dashboard'
       path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminGatedDashboardRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/cms': {
+      id: '/admin/_gated/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AdminGatedCmsRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
     '/admin/_gated/audit': {
@@ -679,19 +774,29 @@ const AdminGatedUsersRouteWithChildren = AdminGatedUsersRoute._addFileChildren(
 
 interface AdminGatedRouteRouteChildren {
   AdminGatedAuditRoute: typeof AdminGatedAuditRoute
+  AdminGatedCmsRoute: typeof AdminGatedCmsRoute
   AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
+  AdminGatedNotificationsRoute: typeof AdminGatedNotificationsRoute
   AdminGatedPaymentsRoute: typeof AdminGatedPaymentsRoute
+  AdminGatedReportsRoute: typeof AdminGatedReportsRoute
   AdminGatedSearchRoute: typeof AdminGatedSearchRoute
+  AdminGatedSettingsRoute: typeof AdminGatedSettingsRoute
   AdminGatedSitesRoute: typeof AdminGatedSitesRoute
+  AdminGatedSupportRoute: typeof AdminGatedSupportRoute
   AdminGatedUsersRoute: typeof AdminGatedUsersRouteWithChildren
 }
 
 const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedAuditRoute: AdminGatedAuditRoute,
+  AdminGatedCmsRoute: AdminGatedCmsRoute,
   AdminGatedDashboardRoute: AdminGatedDashboardRoute,
+  AdminGatedNotificationsRoute: AdminGatedNotificationsRoute,
   AdminGatedPaymentsRoute: AdminGatedPaymentsRoute,
+  AdminGatedReportsRoute: AdminGatedReportsRoute,
   AdminGatedSearchRoute: AdminGatedSearchRoute,
+  AdminGatedSettingsRoute: AdminGatedSettingsRoute,
   AdminGatedSitesRoute: AdminGatedSitesRoute,
+  AdminGatedSupportRoute: AdminGatedSupportRoute,
   AdminGatedUsersRoute: AdminGatedUsersRouteWithChildren,
 }
 
