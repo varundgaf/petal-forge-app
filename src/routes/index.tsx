@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -10,6 +11,21 @@ import {
   Layers,
   Check,
   Sparkles,
+  FileCheck2,
+  Wallet,
+  Bell,
+  LifeBuoy,
+  PieChart,
+  Percent,
+  Upload,
+  MapPin,
+  LayoutGrid,
+  KeyRound,
+  FileText,
+  ScrollText,
+  Code2,
+  Server,
+  Lock,
 } from "lucide-react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
@@ -19,17 +35,20 @@ export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "AdProfitly — Enterprise Ad Monetization Platform" },
+      { title: "AdProfitly — Enterprise Publisher Monetization Platform" },
       {
         name: "description",
         content:
-          "Real-time revenue analytics, campaign management, and Adsterra integration for publishers and advertisers. Enterprise-grade AdTech in one console.",
+          "Unified revenue dashboard, multi-network monetization, publisher management, verification, payouts, and CMS — one enterprise platform for modern publishers.",
       },
-      { property: "og:title", content: "AdProfitly — Enterprise Ad Monetization Platform" },
+      { property: "og:title", content: "AdProfitly — Enterprise Publisher Monetization Platform" },
       {
         property: "og:description",
-        content: "Real-time revenue analytics, campaign management, and Adsterra integration for publishers and advertisers. Enterprise-grade AdTech in one console.",
+        content:
+          "Unified revenue dashboard, multi-network monetization, publisher management, verification, payouts, and CMS — one enterprise platform for modern publishers.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
@@ -41,8 +60,10 @@ function HomePage() {
       <LogoStrip />
       <Features />
       <RevenuePanel />
+      <BentoPlatform />
+      <TrustStats />
       <ForWho />
-      <AdsterraSection />
+      <StatsRibbon />
       <CTA />
     </PublicLayout>
   );
@@ -53,9 +74,9 @@ function Hero() {
     <section className="relative overflow-hidden bg-hero">
       <div className="absolute inset-0 grid-bg opacity-40" />
       <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-24 sm:px-6 lg:px-8 lg:pt-32">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-3xl text-center animate-fade-in">
           <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
-            <Sparkles className="mr-1.5 h-3 w-3" /> New · Adsterra native sync
+            <Sparkles className="mr-1.5 h-3 w-3" /> Enterprise publisher platform
           </Badge>
           <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             The revenue engine for
@@ -63,8 +84,8 @@ function Hero() {
             <span className="text-gradient-money">modern ad publishers.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            AdProfitly unifies revenue analytics, campaign management, and Adsterra reporting into
-            one enterprise console. Ship faster, monetize smarter, sleep easier.
+            AdProfitly unifies revenue analytics, publisher management, website verification, and
+            payouts into one enterprise console. Ship faster, monetize smarter, sleep easier.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Button asChild size="lg" variant="hero">
@@ -89,7 +110,7 @@ function Hero() {
 
 function HeroPanel() {
   return (
-    <div className="relative mx-auto mt-16 max-w-5xl">
+    <div className="relative mx-auto mt-16 max-w-5xl animate-fade-in">
       <div className="rounded-2xl border border-border bg-card/60 p-2 shadow-elev-3 backdrop-blur-xl">
         <div className="rounded-xl border border-border bg-surface-elevated p-6">
           <div className="flex items-center justify-between border-b border-border pb-4">
@@ -111,7 +132,10 @@ function HeroPanel() {
               { l: "Fill rate", v: "94.1%", t: "+2.4pt" },
               { l: "Impressions", v: "60.3M", t: "+11.8%" },
             ].map((k) => (
-              <div key={k.l} className="rounded-lg border border-border bg-card p-4">
+              <div
+                key={k.l}
+                className="rounded-lg border border-border bg-card p-4 transition-all hover:border-primary/40 hover:shadow-elev-2"
+              >
                 <div className="text-xs text-muted-foreground">{k.l}</div>
                 <div className="mt-1 font-display text-2xl font-semibold">{k.v}</div>
                 <div className="mt-1 font-mono text-xs text-primary">{k.t}</div>
@@ -172,33 +196,93 @@ function LogoStrip() {
 const features = [
   {
     icon: BarChart3,
-    title: "Real-time analytics",
-    body: "Revenue, impressions, CTR, CPM, RPM streamed with sub-minute latency across every site and ad unit.",
-  },
-  {
-    icon: Globe2,
-    title: "Global geo insights",
-    body: "Country, device, browser, OS, and referrer breakdowns with drill-down and CSV/Excel export.",
+    title: "Unified Revenue Dashboard",
+    body: "Monitor all publisher earnings from one enterprise dashboard with real-time insights and drill-down reporting.",
   },
   {
     icon: Layers,
-    title: "Adsterra native sync",
-    body: "Scheduled sync pulls daily and monthly reports into your dashboard — no spreadsheets, no CSVs.",
-  },
-  {
-    icon: Zap,
-    title: "Campaign builder",
-    body: "Advertisers ship campaigns with creatives, audiences, geo targeting, and budget guardrails in minutes.",
-  },
-  {
-    icon: Shield,
-    title: "Enterprise-grade security",
-    body: "SOC 2 ready, JWT + refresh tokens, 2FA, granular RBAC, and complete audit logs on every action.",
+    title: "Multi-Network Revenue",
+    body: "Connect multiple monetization partners through one platform while keeping reports, payments and websites organized.",
   },
   {
     icon: Users,
-    title: "Multi-tenant by design",
-    body: "Publisher, advertiser, and admin roles with row-level scoping. Teams, invites, and permissions built in.",
+    title: "Publisher Management",
+    body: "Approve publishers, review websites, assign revenue shares and manage every account from one secure platform.",
+  },
+  {
+    icon: Percent,
+    title: "Manual Revenue Control",
+    body: "Administrators keep complete control over reports, balances and payouts — no automated overrides, ever.",
+  },
+  {
+    icon: Globe2,
+    title: "Enterprise Reporting",
+    body: "Beautiful dashboards for revenue, RPM, CTR, impressions, clicks, pageviews, and country-level insights.",
+  },
+  {
+    icon: FileCheck2,
+    title: "Website Verification",
+    body: "Meta tag, DNS, HTML file and ads.txt verification workflows built directly into the platform.",
+  },
+  {
+    icon: Wallet,
+    title: "Secure Payments",
+    body: "Review balances, approve payouts, and maintain a complete audit-friendly payment history.",
+  },
+  {
+    icon: ScrollText,
+    title: "Backend CMS",
+    body: "Manage landing pages, FAQs, contact details, company info, support and branding — no code required.",
+  },
+  {
+    icon: Shield,
+    title: "Enterprise Security",
+    body: "SOC 2 ready, JWT + refresh tokens, 2FA, granular RBAC, and complete audit logs on every action.",
+  },
+  {
+    icon: Bell,
+    title: "Notifications",
+    body: "Broadcast platform updates and account alerts to every publisher segment from one control plane.",
+  },
+  {
+    icon: LifeBuoy,
+    title: "Support Center",
+    body: "Built-in ticketing with priorities, internal notes, and full conversation history for every publisher.",
+  },
+  {
+    icon: MapPin,
+    title: "Country Analytics",
+    body: "Country, device, browser, OS, and referrer breakdowns with drill-down and CSV/Excel export.",
+  },
+  {
+    icon: Upload,
+    title: "Manual Report Imports",
+    body: "Import daily and monthly reports via CSV, Excel, or JSON — bulk update thousands of rows in seconds.",
+  },
+  {
+    icon: LayoutGrid,
+    title: "Ad Unit Management",
+    body: "Create, tag, and organize ad units per site with copyable zone IDs and per-unit performance.",
+  },
+  {
+    icon: KeyRound,
+    title: "Role Based Access",
+    body: "Publisher, admin, and operator roles with row-level scoping. Teams, invites, and permissions built in.",
+  },
+  {
+    icon: FileText,
+    title: "Audit Logs",
+    body: "Every admin action captured with actor, IP, device, old value and new value — immutable by design.",
+  },
+  {
+    icon: Code2,
+    title: "REST APIs",
+    body: "Programmatic access to publishers, reports, payments and settings for deep enterprise integrations.",
+  },
+  {
+    icon: PieChart,
+    title: "Revenue Sharing",
+    body: "Configure per-publisher and per-site revenue shares with overrides and full historical tracking.",
   },
 ];
 
@@ -209,10 +293,10 @@ function Features() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">Platform</p>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-            Everything an AdTech team needs.
+            Everything a modern publisher platform needs.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            One codebase. One console. Publishers, advertisers, and operations aligned around live
+            One codebase. One console. Publishers, operators, and finance aligned around live
             revenue data.
           </p>
         </div>
@@ -221,7 +305,7 @@ function Features() {
           {features.map((f) => (
             <div
               key={f.title}
-              className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+              className="group rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-elev-2"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-gradient-money group-hover:text-primary-foreground">
                 <f.icon className="h-5 w-5" />
@@ -242,22 +326,22 @@ function RevenuePanel() {
       <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">
-            Adsterra Integration
+            Enterprise Reporting
           </p>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-            Every Adsterra metric,{" "}
-            <span className="text-gradient-money">automatically synced.</span>
+            Every metric that matters,{" "}
+            <span className="text-gradient-money">one clear view.</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            AdProfitly pulls reports, revenue, impressions, requests, fill rate, CTR, CPM, eCPM,
-            RPM, and country and device breakdowns from Adsterra on your schedule.
+            Track revenue, impressions, requests, fill rate, CTR, CPM, eCPM, RPM, plus country and
+            device breakdowns — updated continuously across every site and ad unit.
           </p>
           <ul className="mt-6 space-y-3">
             {[
-              "Scheduled daily + monthly sync",
-              "Admin can sync all publishers at once",
-              "Publishers only see their own reports",
-              "Secure backend-only Adsterra endpoints",
+              "Manual and imported report entry (CSV, Excel, JSON)",
+              "Admins control balances, payouts, and revenue share",
+              "Publishers only see their own performance and payouts",
+              "Enterprise-grade RBAC, audit logs and SSO-ready security",
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -273,7 +357,7 @@ function RevenuePanel() {
               <LineChart className="h-4 w-4 text-primary" />
               <span className="font-medium">Country report</span>
             </div>
-            <span className="font-mono text-xs text-muted-foreground">Adsterra · last 7d</span>
+            <span className="font-mono text-xs text-muted-foreground">last 7d</span>
           </div>
           <div className="mt-4 space-y-3">
             {[
@@ -300,6 +384,133 @@ function RevenuePanel() {
   );
 }
 
+const bento = [
+  { icon: Users, title: "Publisher Portal", body: "Self-serve dashboard for revenue, sites and payouts.", span: "lg:col-span-2" },
+  { icon: FileCheck2, title: "Website Verification", body: "Meta tag, DNS, HTML file and ads.txt flows.", span: "" },
+  { icon: BarChart3, title: "Analytics", body: "Revenue, RPM, CTR, impressions, clicks and country insights.", span: "" },
+  { icon: Wallet, title: "Payments", body: "Approve payouts, mark paid, and archive full history.", span: "" },
+  { icon: Server, title: "Admin Control", body: "Full command over publishers, sites, payments and roles.", span: "lg:col-span-2" },
+  { icon: ScrollText, title: "Backend CMS", body: "Edit landing, FAQ, footer, legal and branding live.", span: "" },
+  { icon: Bell, title: "Notifications", body: "Broadcasts, alerts and per-account announcements.", span: "" },
+  { icon: LifeBuoy, title: "Support", body: "Ticketing with priorities, internal notes and history.", span: "" },
+];
+
+function BentoPlatform() {
+  return (
+    <section className="py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">Enterprise Platform</p>
+          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+            One platform. Every workflow.
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            A tightly integrated suite covering the entire publisher lifecycle — from onboarding to
+            payouts.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {bento.map((b) => (
+            <div
+              key={b.title}
+              className={`group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-elev-2 ${b.span}`}
+            >
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-gradient-money group-hover:text-primary-foreground">
+                <b.icon className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 font-display text-lg font-semibold">{b.title}</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">{b.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function useCounter(target: number, duration = 1400) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const step = (t: number) => {
+            const p = Math.min(1, (t - start) / duration);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setVal(Math.round(target * eased));
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      });
+    }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [target, duration]);
+  return { val, ref };
+}
+
+function TrustStat({ target, suffix, prefix, label }: { target: number; suffix?: string; prefix?: string; label: string }) {
+  const { val, ref } = useCounter(target);
+  const formatted = target >= 1000 ? val.toLocaleString() : val.toString();
+  return (
+    <div ref={ref} className="rounded-2xl border border-border bg-card p-6 text-center">
+      <div className="font-display text-4xl font-semibold text-gradient-money">
+        {prefix}
+        {formatted}
+        {suffix}
+      </div>
+      <div className="mt-2 text-sm text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function TrustStats() {
+  return (
+    <section className="border-y border-border/60 bg-surface py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">Trusted at scale</p>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            Built for enterprise revenue teams.
+          </h2>
+        </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <TrustStat target={4200} suffix="+" label="Active Publishers" />
+          <TrustStat target={12800} suffix="+" label="Verified Websites" />
+          <TrustStat target={186000} suffix="+" label="Monthly Reports Processed" />
+          <TrustStat target={140} suffix="+" label="Countries Supported" />
+          <TrustStat target={99} suffix=".99%" label="Platform Uptime" />
+        </div>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {[
+            { icon: Shield, label: "SOC 2 Ready" },
+            { icon: Lock, label: "GDPR Compliant" },
+            { icon: KeyRound, label: "2FA + RBAC" },
+            { icon: FileText, label: "Immutable Audit Logs" },
+          ].map((t) => (
+            <span
+              key={t.label}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 font-mono text-xs text-muted-foreground"
+            >
+              <t.icon className="h-3 w-3 text-primary" />
+              {t.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ForWho() {
   const cards = [
     {
@@ -309,15 +520,15 @@ function ForWho() {
       link: "/features",
     },
     {
-      role: "For Advertisers",
-      title: "Launch campaigns that scale.",
-      body: "Build campaigns with creatives, audiences, geo targeting, and pixel tracking. Reports and billing built in.",
+      role: "For Operators",
+      title: "Run the platform end-to-end.",
+      body: "Approve publishers, verify sites, assign revenue shares, and manage payouts from one console.",
       link: "/features",
     },
     {
       role: "For Admin Teams",
-      title: "Operate the platform end-to-end.",
-      body: "Users, KYC, plans, coupons, CMS, roles, permissions, audit logs, and system health — all one click away.",
+      title: "Total control, zero surprises.",
+      body: "Users, KYC, plans, coupons, CMS, roles, permissions, audit logs, and system health — one click away.",
       link: "/features",
     },
   ];
@@ -329,7 +540,7 @@ function ForWho() {
           {cards.map((c) => (
             <div
               key={c.role}
-              className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6"
+              className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-elev-2"
             >
               <div>
                 <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
@@ -354,7 +565,7 @@ function ForWho() {
   );
 }
 
-function AdsterraSection() {
+function StatsRibbon() {
   return (
     <section className="bg-surface py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -385,8 +596,7 @@ function CTA() {
             Ready to see your revenue clearly?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Sign up in under 60 seconds. Connect your Adsterra account and see the first sync land
-            live.
+            Sign up in under 60 seconds. Add your first website and start monetizing from day one.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" variant="hero">
