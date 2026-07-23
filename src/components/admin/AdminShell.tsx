@@ -8,6 +8,12 @@ import {
   ScrollText,
   Shield,
   LogOut,
+  BarChart3,
+  Bell,
+  LifeBuoy,
+  FileText,
+  Settings,
+  Search,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,9 +21,15 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/admin/dashboard", label: "Overview", icon: LayoutDashboard },
-  { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/search", label: "Global search", icon: Search },
+  { to: "/admin/users", label: "Publishers", icon: Users },
   { to: "/admin/sites", label: "Websites", icon: Globe },
+  { to: "/admin/reports", label: "Reports", icon: BarChart3 },
   { to: "/admin/payments", label: "Payments", icon: Wallet },
+  { to: "/admin/notifications", label: "Notifications", icon: Bell },
+  { to: "/admin/support", label: "Support", icon: LifeBuoy },
+  { to: "/admin/cms", label: "CMS", icon: FileText },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
   { to: "/admin/audit", label: "Audit logs", icon: ScrollText },
 ] as const;
 
