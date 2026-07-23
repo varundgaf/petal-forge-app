@@ -161,6 +161,9 @@ function UserDetail() {
             <Field label="Full name">
               <Input value={form.name ?? ""} onChange={(e) => set("name", e.target.value)} />
             </Field>
+            <Field label="Username">
+              <Input value={form.username ?? ""} onChange={(e) => set("username", e.target.value)} />
+            </Field>
             <Field label="Email">
               <Input value={form.email ?? ""} onChange={(e) => set("email", e.target.value)} />
             </Field>
@@ -172,6 +175,9 @@ function UserDetail() {
             </Field>
             <Field label="Country">
               <Input value={form.country ?? ""} onChange={(e) => set("country", e.target.value)} />
+            </Field>
+            <Field label="Language">
+              <Input value={form.language ?? ""} onChange={(e) => set("language", e.target.value)} placeholder="en" />
             </Field>
             <Field label="Timezone">
               <Input value={form.timezone ?? ""} onChange={(e) => set("timezone", e.target.value)} />
