@@ -171,7 +171,8 @@ function SupportPage() {
                   rows={2}
                   defaultValue={detail.ticket.internal_notes ?? ""}
                   onBlur={(e) => {
-                    if (e.target.value !== (detail.ticket.internal_notes ?? "")) update.mutate({ internal_notes: e.target.value });
+                    const current = detail.ticket?.internal_notes ?? "";
+                    if (e.target.value !== current) update.mutate({ internal_notes: e.target.value });
                   }}
                 />
               </div>
