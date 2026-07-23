@@ -7,9 +7,9 @@ const cols = [
     links: [
       { to: "/features", label: "Features" },
       { to: "/pricing", label: "Pricing" },
-      { to: "/about", label: "Adsterra Integration" },
-      { to: "/about", label: "Publishers" },
-      { to: "/about", label: "Advertisers" },
+      { to: "/about", label: "Publisher Portal" },
+      { to: "/about", label: "Admin Control" },
+      { to: "/about", label: "Backend CMS" },
     ],
   },
   {
