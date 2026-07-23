@@ -176,34 +176,21 @@ function Dashboard() {
             <li className="flex items-center justify-between"><span className="text-muted-foreground">Server functions</span><span className="flex items-center gap-1.5 text-emerald-500"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational</span></li>
           </ul>
         </Card>
-
-      <div className="grid gap-4 lg:grid-cols-2">
         <Card className="border-border/60 bg-card/40 p-5">
           <div className="mb-3 flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">System status</h2>
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Security posture</h2>
           </div>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">Database</span>
-              <span className="flex items-center gap-1.5 text-emerald-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational
-              </span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">Auth service</span>
-              <span className="flex items-center gap-1.5 text-emerald-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational
-              </span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">Server functions</span>
-              <span className="flex items-center gap-1.5 text-emerald-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Operational
-              </span>
-            </li>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li>Row-level security enforced on all publisher tables.</li>
+            <li>Admin actions are recorded in the audit log.</li>
+            <li>Service role restricted to server functions.</li>
           </ul>
         </Card>
+      </div>
+    </div>
+  );
+}
         <Card className="border-border/60 bg-card/40 p-5">
           <div className="mb-3 flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-primary" />
