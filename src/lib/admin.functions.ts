@@ -171,10 +171,15 @@ export const getUserDetail = createServerFn({ method: "POST" })
 const profilePatchSchema = z.object({
   name: z.string().max(120).nullish(),
   company: z.string().max(120).nullish(),
+  username: z.string().max(60).nullish(),
   email: z.string().email().nullish(),
   phone: z.string().max(40).nullish(),
   country: z.string().max(60).nullish(),
+  language: z.string().max(20).nullish(),
   timezone: z.string().max(60).nullish(),
+  currency: z.string().max(10).nullish(),
+  tax_id: z.string().max(120).nullish(),
+  payment_cycle: z.string().max(20).nullish(),
   payment_method: z.enum(["paypal", "wire", "crypto_btc", "crypto_usdt", "payoneer"]).nullish(),
   payment_email: z.string().max(200).nullish(),
   revenue_share: z.coerce.number().min(0).max(100).nullish(),
@@ -182,6 +187,10 @@ const profilePatchSchema = z.object({
   status: z.enum(["active", "suspended", "banned"]).nullish(),
   admin_notes: z.string().max(4000).nullish(),
   kyc_status: z.enum(["unverified", "pending", "verified", "rejected"]).nullish(),
+  phone_verified: z.boolean().nullish(),
+  email_verified: z.boolean().nullish(),
+  website: z.string().max(200).nullish(),
+  avatar_url: z.string().max(500).nullish(),
 });
 
 export const updateUser = createServerFn({ method: "POST" })
