@@ -1,19 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
   Users as UsersIcon,
   UserCheck,
   UserX,
-  Globe,
+  UserMinus,
   CheckCircle2,
   XCircle,
   Clock,
   DollarSign,
   Activity,
   ShieldCheck,
+  LifeBuoy,
 } from "lucide-react";
-import { getAdminStats } from "@/lib/admin.functions";
+import { getAdminStats, getDashboardExtras } from "@/lib/admin.functions";
 import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/admin/_gated/dashboard")({
