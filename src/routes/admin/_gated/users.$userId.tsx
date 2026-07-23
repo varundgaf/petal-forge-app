@@ -219,6 +219,22 @@ function UserDetail() {
                 onChange={(e) => set("min_payout", e.target.value)}
               />
             </Field>
+            <Field label="Payment cycle">
+              <Select value={form.payment_cycle ?? ""} onValueChange={(v) => set("payment_cycle", v)}>
+                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Currency">
+              <Input value={form.currency ?? ""} onChange={(e) => set("currency", e.target.value)} placeholder="USD" />
+            </Field>
+            <Field label="Tax ID / VAT">
+              <Input value={form.tax_id ?? ""} onChange={(e) => set("tax_id", e.target.value)} />
+            </Field>
             <Field label="KYC status">
               <Select value={form.kyc_status ?? ""} onValueChange={(v) => set("kyc_status", v)}>
                 <SelectTrigger>
