@@ -121,31 +121,61 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_content: {
+        Row: {
+          key: string
+          published: boolean
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          published?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          published?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
           created_at: string
+          created_by: string | null
           id: string
           kind: string
           read: boolean
+          scheduled_for: string | null
           title: string
           user_id: string
         }
         Insert: {
           body?: string | null
           created_at?: string
+          created_by?: string | null
           id?: string
           kind?: string
           read?: boolean
+          scheduled_for?: string | null
           title: string
           user_id: string
         }
         Update: {
           body?: string | null
           created_at?: string
+          created_by?: string | null
           id?: string
           kind?: string
           read?: boolean
+          scheduled_for?: string | null
           title?: string
           user_id?: string
         }
@@ -157,6 +187,7 @@ export type Database = {
           created_at: string
           destination: string | null
           id: string
+          invoice_url: string | null
           method: Database["public"]["Enums"]["payment_method"]
           notes: string | null
           paid_at: string | null
@@ -172,6 +203,7 @@ export type Database = {
           created_at?: string
           destination?: string | null
           id?: string
+          invoice_url?: string | null
           method: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           paid_at?: string | null
@@ -187,6 +219,7 @@ export type Database = {
           created_at?: string
           destination?: string | null
           id?: string
+          invoice_url?: string | null
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           paid_at?: string | null
@@ -199,6 +232,27 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           admin_notes: string | null
@@ -206,22 +260,29 @@ export type Database = {
           company: string | null
           country: string | null
           created_at: string
+          currency: string | null
           discord: string | null
           email: string
+          email_verified: boolean
           id: string
           kyc_status: Database["public"]["Enums"]["kyc_status"]
+          language: string | null
           min_payout: number
           name: string | null
+          payment_cycle: string | null
           payment_email: string | null
           payment_method: Database["public"]["Enums"]["payment_method"] | null
           phone: string | null
+          phone_verified: boolean
           publisher_id: string | null
           revenue_share: number
           status: Database["public"]["Enums"]["profile_status"]
+          tax_id: string | null
           telegram: string | null
           timezone: string | null
           two_factor_enabled: boolean
           updated_at: string
+          username: string | null
           website: string | null
         }
         Insert: {
@@ -230,22 +291,29 @@ export type Database = {
           company?: string | null
           country?: string | null
           created_at?: string
+          currency?: string | null
           discord?: string | null
           email: string
+          email_verified?: boolean
           id: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          language?: string | null
           min_payout?: number
           name?: string | null
+          payment_cycle?: string | null
           payment_email?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
           phone?: string | null
+          phone_verified?: boolean
           publisher_id?: string | null
           revenue_share?: number
           status?: Database["public"]["Enums"]["profile_status"]
+          tax_id?: string | null
           telegram?: string | null
           timezone?: string | null
           two_factor_enabled?: boolean
           updated_at?: string
+          username?: string | null
           website?: string | null
         }
         Update: {
@@ -254,22 +322,29 @@ export type Database = {
           company?: string | null
           country?: string | null
           created_at?: string
+          currency?: string | null
           discord?: string | null
           email?: string
+          email_verified?: boolean
           id?: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          language?: string | null
           min_payout?: number
           name?: string | null
+          payment_cycle?: string | null
           payment_email?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
           phone?: string | null
+          phone_verified?: boolean
           publisher_id?: string | null
           revenue_share?: number
           status?: Database["public"]["Enums"]["profile_status"]
+          tax_id?: string | null
           telegram?: string | null
           timezone?: string | null
           two_factor_enabled?: boolean
           updated_at?: string
+          username?: string | null
           website?: string | null
         }
         Relationships: []
@@ -333,36 +408,131 @@ export type Database = {
       }
       sites: {
         Row: {
+          ad_network: string | null
+          admin_notes: string | null
           category: string | null
+          country: string | null
           created_at: string
           domain: string
           id: string
+          language: string | null
           monthly_visitors: number | null
+          name: string | null
+          rev_share_override: number | null
           status: Database["public"]["Enums"]["site_status"]
+          updated_at: string
+          user_id: string
+          verification_status: string
+        }
+        Insert: {
+          ad_network?: string | null
+          admin_notes?: string | null
+          category?: string | null
+          country?: string | null
+          created_at?: string
+          domain: string
+          id?: string
+          language?: string | null
+          monthly_visitors?: number | null
+          name?: string | null
+          rev_share_override?: number | null
+          status?: Database["public"]["Enums"]["site_status"]
+          updated_at?: string
+          user_id: string
+          verification_status?: string
+        }
+        Update: {
+          ad_network?: string | null
+          admin_notes?: string | null
+          category?: string | null
+          country?: string | null
+          created_at?: string
+          domain?: string
+          id?: string
+          language?: string | null
+          monthly_visitors?: number | null
+          name?: string | null
+          rev_share_override?: number | null
+          status?: Database["public"]["Enums"]["site_status"]
+          updated_at?: string
+          user_id?: string
+          verification_status?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          internal_notes: string | null
+          priority: string
+          status: string
+          subject: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          category?: string | null
+          body?: string | null
           created_at?: string
-          domain: string
           id?: string
-          monthly_visitors?: number | null
-          status?: Database["public"]["Enums"]["site_status"]
+          internal_notes?: string | null
+          priority?: string
+          status?: string
+          subject: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          category?: string | null
+          body?: string | null
           created_at?: string
-          domain?: string
           id?: string
-          monthly_visitors?: number | null
-          status?: Database["public"]["Enums"]["site_status"]
+          internal_notes?: string | null
+          priority?: string
+          status?: string
+          subject?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      ticket_messages: {
+        Row: {
+          attachment_url: string | null
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          is_admin: boolean
+          ticket_id: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          ticket_id: string
+        }
+        Update: {
+          attachment_url?: string | null
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
