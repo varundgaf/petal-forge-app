@@ -191,18 +191,3 @@ function Dashboard() {
     </div>
   );
 }
-        <Card className="border-border/60 bg-card/40 p-5">
-          <div className="mb-3 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Security posture</h2>
-          </div>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>Row-level security enforced on all publisher tables.</li>
-            <li>Admin actions are recorded in the audit log.</li>
-            <li>Service role restricted to server functions.</li>
-          </ul>
-        </Card>
-      </div>
-    </div>
-  );
-}
