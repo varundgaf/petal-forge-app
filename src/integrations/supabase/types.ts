@@ -359,6 +359,7 @@ export type Database = {
           date: string
           id: string
           impressions: number
+          pageviews: number
           revenue: number
           site_id: string | null
           user_id: string
@@ -372,6 +373,7 @@ export type Database = {
           date: string
           id?: string
           impressions?: number
+          pageviews?: number
           revenue?: number
           site_id?: string | null
           user_id: string
@@ -385,6 +387,7 @@ export type Database = {
           date?: string
           id?: string
           impressions?: number
+          pageviews?: number
           revenue?: number
           site_id?: string | null
           user_id?: string
