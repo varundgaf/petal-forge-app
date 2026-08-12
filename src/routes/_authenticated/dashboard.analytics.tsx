@@ -263,23 +263,23 @@ function AnalyticsPage() {
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={view.daily}>
-                <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.4} />
                 <XAxis
                   dataKey="date"
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   tickFormatter={(d) => format(new Date(d), "MMM d")}
                   fontSize={12}
                 />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    background: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
                     borderRadius: 8,
                   }}
                 />
-                <Bar dataKey="impressions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="clicks" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="impressions" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="clicks" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -292,26 +292,26 @@ function AnalyticsPage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={view.daily}>
-                <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.4} />
                 <XAxis
                   dataKey="date"
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   tickFormatter={(d) => format(new Date(d), "MMM d")}
                   fontSize={12}
                 />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
                 <Tooltip
                   formatter={(v: number) => `$${Number(v).toFixed(2)}`}
                   contentStyle={{
-                    background: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
                     borderRadius: 8,
                   }}
                 />
                 <Line
                   type="monotone"
                   dataKey="revenue"
-                  stroke="hsl(var(--primary))"
+                  stroke="var(--chart-1)"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -324,26 +324,26 @@ function AnalyticsPage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={view.daily}>
-                <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.4} />
                 <XAxis
                   dataKey="date"
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   tickFormatter={(d) => format(new Date(d), "MMM d")}
                   fontSize={12}
                 />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
                 <Tooltip
                   formatter={(v: number) => `$${Number(v).toFixed(2)}`}
                   contentStyle={{
-                    background: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
                     borderRadius: 8,
                   }}
                 />
                 <Line
                   type="monotone"
                   dataKey="ecpm"
-                  stroke="hsl(var(--accent))"
+                  stroke="var(--chart-2)"
                   strokeWidth={2}
                   dot={{ r: 2 }}
                 />
