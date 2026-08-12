@@ -50,7 +50,7 @@ async function fetchOverview() {
   const [rev, sites, units, payments, notifs, activity] = await Promise.all([
     supabase
       .from("revenue_events")
-      .select("date, impressions, clicks, revenue, country, site_id, sites(domain)")
+      .select("date, pageviews, impressions, clicks, revenue, country, site_id, sites(domain)")
       .gte("date", since)
       .order("date", { ascending: true }),
     supabase.from("sites").select("id, domain, status, monthly_visitors"),
@@ -156,6 +156,7 @@ function OverviewPage() {
       last7 = 0,
       last30 = 0,
       lifetime = 0,
+      pageviews = 0,
       impressions = 0,
       clicks = 0,
       requests = 0,
@@ -172,6 +173,7 @@ function OverviewPage() {
       const clk = Number(r.clicks);
       lifetime += rv;
       last30 += rv;
+      pageviews += Number(r.pageviews ?? 0);
       impressions += imp;
       clicks += clk;
       requests += Math.round(imp * 1.18);
@@ -229,6 +231,7 @@ function OverviewPage() {
       last7,
       last30,
       lifetime,
+      pageviews,
       impressions,
       clicks,
       ctr,
@@ -419,6 +422,13 @@ function OverviewPage() {
           Performance
         </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Pageviews"
+            value={num(stats.pageviews)}
+            icon={Eye}
+            loading={isLoading}
+            tooltip="Pageviews reported across your sites in the last 30 days."
+          />
           <StatCard
             label="Impressions"
             value={num(stats.impressions)}
