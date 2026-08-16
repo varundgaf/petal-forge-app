@@ -272,12 +272,15 @@ function AnalyticsPage() {
                 />
                 <YAxis stroke="var(--muted-foreground)" fontSize={12} />
                 <Tooltip
+                  cursor={{ fill: "oklch(1 0 0 / 0.05)", radius: 6 }}
                   contentStyle={{
                     background: "var(--card)",
                     border: "1px solid var(--border)",
                     borderRadius: 8,
                   }}
+                  labelStyle={{ color: "var(--muted-foreground)" }}
                 />
+
                 <Bar dataKey="impressions" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="clicks" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
               </BarChart>
