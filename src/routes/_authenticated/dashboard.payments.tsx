@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { addDays, format, nextMonday } from "date-fns";
+import { format } from "date-fns";
 import { Wallet, Plus, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-store";
@@ -84,7 +84,6 @@ function PaymentsPage() {
       ?.filter((p) => ["pending", "approved", "processing"].includes(p.status))
       .reduce((s, p) => s + Number(p.amount), 0) ?? 0;
   const availableBalance = Math.max(0, (revenue ?? 0) - paidTotal - pendingTotal);
-  const nextPaymentDate = nextMonday(new Date());
   const canRequest = availableBalance >= MIN_PAYOUT;
 
   const request = useMutation({
@@ -217,7 +216,7 @@ function PaymentsPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Available</p>
           <p className="mt-2 font-display text-2xl font-semibold text-primary">
@@ -231,17 +230,6 @@ function PaymentsPage() {
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Lifetime paid</p>
           <p className="mt-2 font-display text-2xl font-semibold">${paidTotal.toFixed(2)}</p>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            Next weekly cycle
-          </p>
-          <p className="mt-2 font-display text-lg font-semibold">
-            {format(nextPaymentDate, "MMM d, yyyy")}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            in {Math.max(1, Math.ceil((+nextPaymentDate - Date.now()) / 86400000))} days
-          </p>
         </div>
       </div>
 
@@ -304,6 +292,3 @@ function PaymentsPage() {
     </div>
   );
 }
-
-// keep addDays import used to avoid tree-shake noise if referenced later
-void addDays;
