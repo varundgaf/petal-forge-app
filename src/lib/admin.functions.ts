@@ -453,7 +453,7 @@ export const listRevenue = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("revenue_events")
-      .select("id,date,revenue,impressions,clicks,cpm,country,user_id,site_id, profiles!inner(email,publisher_id)")
+      .select("id,date,revenue,impressions,pageviews,clicks,cpm,country,user_id,site_id, profiles!inner(email,publisher_id)")
       .order("date", { ascending: false })
       .limit(data.limit ?? 200);
     if (data.userId) q = q.eq("user_id", data.userId);
@@ -471,6 +471,7 @@ export const upsertRevenue = createServerFn({ method: "POST" })
     date: string;
     revenue: number;
     impressions?: number;
+    pageviews?: number;
     clicks?: number;
     cpm?: number;
     country?: string | null;
@@ -484,6 +485,7 @@ export const upsertRevenue = createServerFn({ method: "POST" })
       date: data.date,
       revenue: data.revenue,
       impressions: data.impressions ?? 0,
+      pageviews: data.pageviews ?? 0,
       clicks: data.clicks ?? 0,
       cpm: data.cpm ?? 0,
       country: data.country ?? null,
@@ -514,7 +516,7 @@ export const deleteRevenue = createServerFn({ method: "POST" })
 
 export const bulkImportRevenue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { rows: Array<{ user_id: string; date: string; revenue: number; impressions?: number; clicks?: number; cpm?: number; site_id?: string | null; country?: string | null }> }) => d)
+  .inputValidator((d: { rows: Array<{ user_id: string; date: string; revenue: number; impressions?: number; pageviews?: number; clicks?: number; cpm?: number; site_id?: string | null; country?: string | null }> }) => d)
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
     if (!data.rows?.length) return { ok: true, inserted: 0 };
@@ -525,6 +527,7 @@ export const bulkImportRevenue = createServerFn({ method: "POST" })
       date: r.date,
       revenue: Number(r.revenue) || 0,
       impressions: Number(r.impressions ?? 0),
+      pageviews: Number(r.pageviews ?? 0),
       clicks: Number(r.clicks ?? 0),
       cpm: Number(r.cpm ?? 0),
       country: r.country ?? null,

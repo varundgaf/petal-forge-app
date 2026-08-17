@@ -28,7 +28,7 @@ function ReportsPage() {
     queryFn: () => listFn({ data: { limit: 500 } }),
   });
 
-  const [form, setForm] = useState<any>({ user_id: "", date: new Date().toISOString().slice(0, 10), revenue: 0, impressions: 0, clicks: 0, cpm: 0 });
+  const [form, setForm] = useState<any>({ user_id: "", date: new Date().toISOString().slice(0, 10), revenue: 0, impressions: 0, pageviews: 0, clicks: 0, cpm: 0 });
   const [importText, setImportText] = useState("");
 
   const save = useMutation({
@@ -58,7 +58,7 @@ function ReportsPage() {
         <div>
           <h1 className="font-display text-2xl font-semibold">Reports & Revenue</h1>
           <p className="text-sm text-muted-foreground">
-            Manually edit revenue, impressions, clicks and CPM. Changes update publisher dashboards instantly.
+            Manually edit revenue, impressions, pageviews, clicks and CPM. Changes update publisher dashboards instantly.
           </p>
         </div>
         <div className="flex gap-2">
@@ -69,9 +69,9 @@ function ReportsPage() {
             <DialogContent className="max-w-2xl">
               <DialogHeader><DialogTitle>Bulk import revenue</DialogTitle></DialogHeader>
               <p className="text-xs text-muted-foreground">
-                Paste CSV or JSON. CSV headers: <code>user_id,date,revenue,impressions,clicks,cpm,site_id,country</code>. JSON accepts an array of the same fields.
+                Paste CSV or JSON. CSV headers: <code>user_id,date,revenue,impressions,pageviews,clicks,cpm,site_id,country</code>. JSON accepts an array of the same fields.
               </p>
-              <Textarea rows={12} value={importText} onChange={(e) => setImportText(e.target.value)} placeholder='user_id,date,revenue,impressions,clicks,cpm&#10;abc-uuid,2026-07-01,120.50,25000,410,4.8' />
+              <Textarea rows={12} value={importText} onChange={(e) => setImportText(e.target.value)} placeholder='user_id,date,revenue,impressions,pageviews,clicks,cpm&#10;abc-uuid,2026-07-01,120.50,25000,18000,410,4.8' />
               <div className="flex justify-end">
                 <Button variant="hero" onClick={() => importBulk.mutate()} disabled={importBulk.isPending || !importText.trim()}>
                   Import
@@ -90,6 +90,7 @@ function ReportsPage() {
                 <F label="Date"><Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></F>
                 <F label="Revenue"><Input type="number" step="0.01" value={form.revenue} onChange={(e) => setForm({ ...form, revenue: Number(e.target.value) })} /></F>
                 <F label="Impressions"><Input type="number" value={form.impressions} onChange={(e) => setForm({ ...form, impressions: Number(e.target.value) })} /></F>
+                <F label="Pageviews"><Input type="number" value={form.pageviews ?? 0} onChange={(e) => setForm({ ...form, pageviews: Number(e.target.value) })} /></F>
                 <F label="Clicks"><Input type="number" value={form.clicks} onChange={(e) => setForm({ ...form, clicks: Number(e.target.value) })} /></F>
                 <F label="CPM"><Input type="number" step="0.01" value={form.cpm} onChange={(e) => setForm({ ...form, cpm: Number(e.target.value) })} /></F>
                 <F label="Site ID (optional)"><Input value={form.site_id ?? ""} onChange={(e) => setForm({ ...form, site_id: e.target.value || null })} /></F>
@@ -114,6 +115,7 @@ function ReportsPage() {
                 <th className="px-4 py-3 font-medium">Publisher</th>
                 <th className="px-4 py-3 font-medium text-right">Revenue</th>
                 <th className="px-4 py-3 font-medium text-right">Impr.</th>
+                <th className="px-4 py-3 font-medium text-right">Pageviews</th>
                 <th className="px-4 py-3 font-medium text-right">Clicks</th>
                 <th className="px-4 py-3 font-medium text-right">CPM</th>
                 <th className="px-4 py-3 font-medium">Country</th>
@@ -122,13 +124,14 @@ function ReportsPage() {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
+                <tr><td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
               ) : data?.length ? data.map((r: any) => (
                 <tr key={r.id} className="border-b border-border/40">
                   <td className="px-4 py-2 whitespace-nowrap text-muted-foreground">{r.date}</td>
                   <td className="px-4 py-2 text-xs">{r.profiles?.publisher_id ?? r.user_id.slice(0, 8)}</td>
                   <td className="px-4 py-2 text-right font-medium">${Number(r.revenue).toFixed(2)}</td>
                   <td className="px-4 py-2 text-right text-muted-foreground">{Number(r.impressions).toLocaleString()}</td>
+                  <td className="px-4 py-2 text-right text-muted-foreground">{Number(r.pageviews ?? 0).toLocaleString()}</td>
                   <td className="px-4 py-2 text-right text-muted-foreground">{Number(r.clicks).toLocaleString()}</td>
                   <td className="px-4 py-2 text-right text-muted-foreground">${Number(r.cpm).toFixed(2)}</td>
                   <td className="px-4 py-2 text-muted-foreground">{r.country ?? "—"}</td>
@@ -139,7 +142,7 @@ function ReportsPage() {
                   </td>
                 </tr>
               )) : (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">No revenue events yet.</td></tr>
+                <tr><td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">No revenue events yet.</td></tr>
               )}
             </tbody>
           </table>
