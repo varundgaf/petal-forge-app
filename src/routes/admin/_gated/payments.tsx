@@ -256,6 +256,15 @@ function PaymentsPage() {
                         <Button size="sm" variant="outline" onClick={() => openEdit(p)}>
                           Edit
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Delete"
+                          onClick={() => remove.mutate(p.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+
                       </div>
                     </td>
                   </tr>
