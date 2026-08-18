@@ -210,8 +210,9 @@ function PaymentsPage() {
                     Loading…
                   </td>
                 </tr>
-              ) : data?.length ? (
-                data.map((p: any) => (
+              ) : rows.length ? (
+                rows.map((p: any) => (
+
                   <tr key={p.id} className="border-b border-border/40 hover:bg-accent/30">
                     <td className="px-4 py-3 font-mono text-xs">{p.reference_id ?? p.id.slice(0, 8)}</td>
                     <td className="px-4 py-3 text-muted-foreground">
