@@ -3,8 +3,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Search } from "lucide-react";
-import { listPayments, updatePayment } from "@/lib/admin.functions";
+import { CheckCircle2, XCircle, Search, Plus, Trash2 } from "lucide-react";
+import {
+  listPayments,
+  updatePayment,
+  createPayment,
+  deletePayment,
+  listPublisherOptions,
+} from "@/lib/admin.functions";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,25 +35,87 @@ export const Route = createFileRoute("/admin/_gated/payments")({
   component: PaymentsPage,
 });
 
+const METHODS = ["paypal", "wire", "crypto_btc", "crypto_usdt", "payoneer"] as const;
+const STATUSES = ["pending", "approved", "processing", "paid", "rejected", "failed"] as const;
+
 function PaymentsPage() {
   const qc = useQueryClient();
   const listFn = useServerFn(listPayments);
   const updFn = useServerFn(updatePayment);
+  const createFn = useServerFn(createPayment);
+  const delFn = useServerFn(deletePayment);
+  const pubsFn = useServerFn(listPublisherOptions);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [editing, setEditing] = useState<any | null>(null);
   const [tx, setTx] = useState("");
   const [notes, setNotes] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({
+    user_id: "",
+    amount: "",
+    method: "wire" as (typeof METHODS)[number],
+    status: "pending" as (typeof STATUSES)[number],
+    destination: "",
+    reference_id: "",
+    tx_hash: "",
+    notes: "",
+    requested_at: new Date().toISOString().slice(0, 10),
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "payments", search, status],
     queryFn: () => listFn({ data: { search, status: status === "all" ? undefined : status } }),
   });
 
+  const { data: publishers } = useQuery({
+    queryKey: ["admin", "publisher-options"],
+    queryFn: () => pubsFn(),
+  });
+
+  const rows: any[] = (data as any[]) ?? [];
+  const sum = (f: (p: any) => boolean) =>
+    rows.filter(f).reduce((s, p) => s + Number(p.amount), 0);
+  const paidTotal = sum((p) => p.status === "paid");
+  const pendingTotal = sum((p) => ["pending", "approved", "processing"].includes(p.status));
+
   const change = useMutation({
     mutationFn: (v: any) => updFn({ data: v }),
     onSuccess: () => {
       toast.success("Payment updated");
+      qc.invalidateQueries({ queryKey: ["admin", "payments"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const add = useMutation({
+    mutationFn: () =>
+      createFn({
+        data: {
+          user_id: form.user_id,
+          amount: Number(form.amount),
+          method: form.method,
+          status: form.status,
+          destination: form.destination,
+          reference_id: form.reference_id,
+          tx_hash: form.tx_hash,
+          notes: form.notes,
+          requested_at: form.requested_at,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Payment added");
+      qc.invalidateQueries({ queryKey: ["admin", "payments"] });
+      setAddOpen(false);
+      setForm({ ...form, amount: "", destination: "", reference_id: "", tx_hash: "", notes: "" });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: (paymentId: string) => delFn({ data: { paymentId } }),
+    onSuccess: () => {
+      toast.success("Payment deleted");
       qc.invalidateQueries({ queryKey: ["admin", "payments"] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -72,7 +140,7 @@ function PaymentsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold">Payments</h1>
-          <p className="text-sm text-muted-foreground">{data?.length ?? 0} payouts</p>
+          <p className="text-sm text-muted-foreground">{rows.length} payouts</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="relative">
@@ -90,16 +158,35 @@ function PaymentsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s} className="capitalize">
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          <Button variant="hero" onClick={() => setAddOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add payment
+          </Button>
         </div>
       </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card className="border-border/60 bg-card/40 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Pending / processing</p>
+          <p className="mt-1 font-display text-2xl font-semibold">${pendingTotal.toFixed(2)}</p>
+        </Card>
+        <Card className="border-border/60 bg-card/40 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Lifetime paid</p>
+          <p className="mt-1 font-display text-2xl font-semibold text-primary">${paidTotal.toFixed(2)}</p>
+        </Card>
+        <Card className="border-border/60 bg-card/40 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Records</p>
+          <p className="mt-1 font-display text-2xl font-semibold">{rows.length}</p>
+        </Card>
+      </div>
+
 
       <Card className="overflow-hidden border-border/60 bg-card/40">
         <div className="overflow-x-auto">
@@ -123,8 +210,9 @@ function PaymentsPage() {
                     Loading…
                   </td>
                 </tr>
-              ) : data?.length ? (
-                data.map((p: any) => (
+              ) : rows.length ? (
+                rows.map((p: any) => (
+
                   <tr key={p.id} className="border-b border-border/40 hover:bg-accent/30">
                     <td className="px-4 py-3 font-mono text-xs">{p.reference_id ?? p.id.slice(0, 8)}</td>
                     <td className="px-4 py-3 text-muted-foreground">
@@ -168,6 +256,15 @@ function PaymentsPage() {
                         <Button size="sm" variant="outline" onClick={() => openEdit(p)}>
                           Edit
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Delete"
+                          onClick={() => remove.mutate(p.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+
                       </div>
                     </td>
                   </tr>
@@ -209,6 +306,136 @@ function PaymentsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add payment</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label className="mb-1.5 block text-xs">Publisher</Label>
+              <Select
+                value={form.user_id}
+                onValueChange={(v) => {
+                  const p: any = (publishers as any[])?.find((x) => x.id === v);
+                  setForm({
+                    ...form,
+                    user_id: v,
+                    method: p?.payment_method ?? form.method,
+                    destination: form.destination || p?.payment_email || "",
+                  });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select publisher" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(publishers as any[])?.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.email} {p.publisher_id ? `· ${p.publisher_id}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Amount (USD)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Date</Label>
+              <Input
+                type="date"
+                value={form.requested_at}
+                onChange={(e) => setForm({ ...form, requested_at: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Method</Label>
+              <Select
+                value={form.method}
+                onValueChange={(v) => setForm({ ...form, method: v as any })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {METHODS.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m.replace("_", " ").toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Status</Label>
+              <Select
+                value={form.status}
+                onValueChange={(v) => setForm({ ...form, status: v as any })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map((s) => (
+                    <SelectItem key={s} value={s} className="capitalize">
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="mb-1.5 block text-xs">Destination</Label>
+              <Input
+                placeholder="Email, wallet address, or account #"
+                value={form.destination}
+                onChange={(e) => setForm({ ...form, destination: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Reference ID (optional)</Label>
+              <Input
+                placeholder="Auto-generated"
+                value={form.reference_id}
+                onChange={(e) => setForm({ ...form, reference_id: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Transaction ID / hash</Label>
+              <Input value={form.tx_hash} onChange={(e) => setForm({ ...form, tx_hash: e.target.value })} />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="mb-1.5 block text-xs">Notes</Label>
+              <Textarea
+                rows={2}
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="hero"
+              disabled={!form.user_id || !Number(form.amount) || add.isPending}
+              onClick={() => add.mutate()}
+            >
+              {add.isPending ? "Saving…" : "Add payment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
 }

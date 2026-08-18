@@ -324,15 +324,96 @@ export const listPayments = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("payments")
-      .select("*, profiles!inner(email,name,publisher_id)")
+      .select("*")
       .order("requested_at", { ascending: false })
-      .limit(200);
+      .limit(300);
     if (data.status) q = q.eq("status", data.status as any);
-    if (data.search) q = q.or(`reference_id.ilike.%${data.search}%,destination.ilike.%${data.search}%`);
+    if (data.search)
+      q = q.or(`reference_id.ilike.%${data.search}%,destination.ilike.%${data.search}%`);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+
+    const ids = [...new Set((rows ?? []).map((r) => r.user_id))];
+    let map = new Map<string, { email: string; name: string | null; publisher_id: string | null }>();
+    if (ids.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id,email,name,publisher_id")
+        .in("id", ids);
+      map = new Map((profs ?? []).map((p) => [p.id, { email: p.email, name: p.name, publisher_id: p.publisher_id }]));
+    }
+    let out = (rows ?? []).map((r) => ({ ...r, profiles: map.get(r.user_id) ?? null }));
+    if (data.search) {
+      // keep server-side matched rows; nothing extra needed
+    }
+    return out;
   });
+
+export const listPublisherOptions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id,email,name,publisher_id,payment_method,payment_email")
+      .order("email");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const createPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: {
+    user_id: string;
+    amount: number;
+    method: "paypal" | "wire" | "crypto_btc" | "crypto_usdt" | "payoneer";
+    status: "pending" | "processing" | "paid" | "failed" | "approved" | "rejected";
+    destination?: string;
+    reference_id?: string;
+    tx_hash?: string;
+    notes?: string;
+    requested_at?: string;
+  }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const reference_id =
+      data.reference_id?.trim() ||
+      `AP-PAY-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(Math.random() * 9000 + 1000)}`;
+    const { data: row, error } = await supabaseAdmin
+      .from("payments")
+      .insert({
+        user_id: data.user_id,
+        amount: data.amount,
+        method: data.method,
+        status: data.status,
+        destination: data.destination || null,
+        reference_id,
+        tx_hash: data.tx_hash || null,
+        notes: data.notes || null,
+        requested_at: data.requested_at ? new Date(data.requested_at).toISOString() : new Date().toISOString(),
+        paid_at: data.status === "paid" ? new Date(data.requested_at ?? Date.now()).toISOString() : null,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    await logAction(context.userId, "payment.create", "payment", row?.id ?? null, { ...data, reference_id });
+    return { ok: true, id: row?.id };
+  });
+
+export const deletePayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { paymentId: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("payments").delete().eq("id", data.paymentId);
+    if (error) throw new Error(error.message);
+    await logAction(context.userId, "payment.delete", "payment", data.paymentId, {});
+    return { ok: true };
+  });
+
 
 export const updatePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
