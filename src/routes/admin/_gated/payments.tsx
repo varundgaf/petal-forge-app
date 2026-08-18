@@ -306,6 +306,136 @@ function PaymentsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add payment</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label className="mb-1.5 block text-xs">Publisher</Label>
+              <Select
+                value={form.user_id}
+                onValueChange={(v) => {
+                  const p: any = (publishers as any[])?.find((x) => x.id === v);
+                  setForm({
+                    ...form,
+                    user_id: v,
+                    method: p?.payment_method ?? form.method,
+                    destination: form.destination || p?.payment_email || "",
+                  });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select publisher" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(publishers as any[])?.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.email} {p.publisher_id ? `· ${p.publisher_id}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Amount (USD)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Date</Label>
+              <Input
+                type="date"
+                value={form.requested_at}
+                onChange={(e) => setForm({ ...form, requested_at: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Method</Label>
+              <Select
+                value={form.method}
+                onValueChange={(v) => setForm({ ...form, method: v as any })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {METHODS.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m.replace("_", " ").toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Status</Label>
+              <Select
+                value={form.status}
+                onValueChange={(v) => setForm({ ...form, status: v as any })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map((s) => (
+                    <SelectItem key={s} value={s} className="capitalize">
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="mb-1.5 block text-xs">Destination</Label>
+              <Input
+                placeholder="Email, wallet address, or account #"
+                value={form.destination}
+                onChange={(e) => setForm({ ...form, destination: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Reference ID (optional)</Label>
+              <Input
+                placeholder="Auto-generated"
+                value={form.reference_id}
+                onChange={(e) => setForm({ ...form, reference_id: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Transaction ID / hash</Label>
+              <Input value={form.tx_hash} onChange={(e) => setForm({ ...form, tx_hash: e.target.value })} />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="mb-1.5 block text-xs">Notes</Label>
+              <Textarea
+                rows={2}
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="hero"
+              disabled={!form.user_id || !Number(form.amount) || add.isPending}
+              onClick={() => add.mutate()}
+            >
+              {add.isPending ? "Saving…" : "Add payment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
 }
