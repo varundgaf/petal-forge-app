@@ -37,6 +37,7 @@ import { Route as AdminGatedNotificationsRouteImport } from './routes/admin/_gat
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
 import { Route as AdminGatedCmsRouteImport } from './routes/admin/_gated/cms'
 import { Route as AdminGatedAuditRouteImport } from './routes/admin/_gated/audit'
+import { Route as AuthenticatedDashboardTrafficQualityRouteImport } from './routes/_authenticated/dashboard.traffic-quality'
 import { Route as AuthenticatedDashboardSitesRouteImport } from './routes/_authenticated/dashboard.sites'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 import { Route as AuthenticatedDashboardPaymentsRouteImport } from './routes/_authenticated/dashboard.payments'
@@ -185,6 +186,12 @@ const AdminGatedAuditRoute = AdminGatedAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AuthenticatedDashboardTrafficQualityRoute =
+  AuthenticatedDashboardTrafficQualityRouteImport.update({
+    id: '/traffic-quality',
+    path: '/traffic-quality',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardSitesRoute =
   AuthenticatedDashboardSitesRouteImport.update({
     id: '/sites',
@@ -251,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
+  '/dashboard/traffic-quality': typeof AuthenticatedDashboardTrafficQualityRoute
   '/admin/audit': typeof AdminGatedAuditRoute
   '/admin/cms': typeof AdminGatedCmsRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
+  '/dashboard/traffic-quality': typeof AuthenticatedDashboardTrafficQualityRoute
   '/admin/audit': typeof AdminGatedAuditRoute
   '/admin/cms': typeof AdminGatedCmsRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
@@ -324,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/sites': typeof AuthenticatedDashboardSitesRoute
+  '/_authenticated/dashboard/traffic-quality': typeof AuthenticatedDashboardTrafficQualityRoute
   '/admin/_gated/audit': typeof AdminGatedAuditRoute
   '/admin/_gated/cms': typeof AdminGatedCmsRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/dashboard/payments'
     | '/dashboard/settings'
     | '/dashboard/sites'
+    | '/dashboard/traffic-quality'
     | '/admin/audit'
     | '/admin/cms'
     | '/admin/dashboard'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/dashboard/payments'
     | '/dashboard/settings'
     | '/dashboard/sites'
+    | '/dashboard/traffic-quality'
     | '/admin/audit'
     | '/admin/cms'
     | '/admin/dashboard'
@@ -434,6 +446,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/payments'
     | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/sites'
+    | '/_authenticated/dashboard/traffic-quality'
     | '/admin/_gated/audit'
     | '/admin/_gated/cms'
     | '/admin/_gated/dashboard'
@@ -666,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedAuditRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/_authenticated/dashboard/traffic-quality': {
+      id: '/_authenticated/dashboard/traffic-quality'
+      path: '/traffic-quality'
+      fullPath: '/dashboard/traffic-quality'
+      preLoaderRoute: typeof AuthenticatedDashboardTrafficQualityRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/sites': {
       id: '/_authenticated/dashboard/sites'
       path: '/sites'
@@ -731,6 +751,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardPaymentsRoute: typeof AuthenticatedDashboardPaymentsRoute
   AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardSitesRoute: typeof AuthenticatedDashboardSitesRoute
+  AuthenticatedDashboardTrafficQualityRoute: typeof AuthenticatedDashboardTrafficQualityRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
@@ -741,6 +762,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardPaymentsRoute: AuthenticatedDashboardPaymentsRoute,
     AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardSitesRoute: AuthenticatedDashboardSitesRoute,
+    AuthenticatedDashboardTrafficQualityRoute:
+      AuthenticatedDashboardTrafficQualityRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
 
