@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   TrendingUp,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-store";
@@ -19,6 +20,7 @@ const links = [
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, exact: false },
   { to: "/dashboard/sites", label: "Sites", icon: Globe, exact: false },
   { to: "/dashboard/ad-units", label: "Ad Units", icon: Layers, exact: false },
+  { to: "/dashboard/traffic-quality", label: "Traffic Quality", icon: ShieldCheck, exact: false },
   { to: "/dashboard/payments", label: "Payments", icon: Wallet, exact: false },
   { to: "/dashboard/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
