@@ -38,7 +38,10 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
       if (error) throw error;
 
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -131,6 +134,9 @@ function LoginPage() {
               id="email"
               type="email"
               autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
