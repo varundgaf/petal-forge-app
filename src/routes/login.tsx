@@ -38,7 +38,10 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
       if (error) throw error;
 
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
