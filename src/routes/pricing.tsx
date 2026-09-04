@@ -22,8 +22,23 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:url", content: "https://adprofitly.com/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://adprofitly.com/pricing" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
+    ],
   }),
 });
+
 
 const plans = [
   {

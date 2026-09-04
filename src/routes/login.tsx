@@ -14,7 +14,12 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Sign in — AdProfitly" },
-      { name: "description", content: "Sign in to your AdProfitly console." },
+      {
+        name: "description",
+        content:
+          "Sign in to your AdProfitly console to access real-time revenue analytics and manage your ad campaigns.",
+      },
+
       { name: "robots", content: "noindex" },
       { property: "og:url", content: "https://adprofitly.com/login" },
       { property: "og:title", content: "Sign in to AdProfitly" },
