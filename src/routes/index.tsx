@@ -48,9 +48,12 @@ export const Route = createFileRoute("/")({
           "Unified revenue dashboard, multi-network monetization, publisher management, verification, payouts, and CMS — one enterprise platform for modern publishers.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://adprofitly.com/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/" }],
   }),
+
 });
 
 function HomePage() {
