@@ -633,8 +633,8 @@ function TrafficQualityPage() {
           <p className="mt-2 text-sm text-muted-foreground">{recommendation.body}</p>
           <p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            VPN/proxy, bot detection, duplicate IP and advanced fraud signals are not available yet — data
-            collection required.
+            Bot, VPN/proxy, duplicate-IP and device signals are shown where recorded; ranges without those
+            signals display “Data collection required”.
           </p>
         </div>
       </div>
