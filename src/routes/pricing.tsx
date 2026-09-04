@@ -4,6 +4,27 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+const faqs = [
+  {
+    q: "How does the Adsterra integration work?",
+    a: "Connect your Adsterra API key in Settings. AdProfitly syncs reports on your schedule and ingests them into your dashboard automatically.",
+  },
+  {
+    q: "Can I switch plans anytime?",
+    a: "Yes. Upgrade or downgrade whenever. Changes prorate to the day.",
+  },
+  {
+    q: "Do you offer volume discounts?",
+    a: "Enterprise pricing is based on revenue tracked and features required. Talk to sales for a custom quote.",
+  },
+  {
+    q: "Is my data secure?",
+    a: "AdProfitly is SOC 2 Type II ready with encryption in transit and at rest, RBAC, and full audit logs.",
+  },
+];
+
+
+
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
   head: () => ({
@@ -19,9 +40,26 @@ export const Route = createFileRoute("/pricing")({
         property: "og:description",
         content: "Simple, revenue-scaled pricing for publishers and advertisers.",
       },
+      { property: "og:url", content: "https://adprofitly.com/pricing" },
+    ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/pricing" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
     ],
   }),
 });
+
 
 const plans = [
   {
@@ -92,7 +130,11 @@ function PricingPage() {
       </section>
 
       <section className="py-16">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold tracking-tight">Plans and pricing</h2>
+        </div>
+        <div className="mx-auto mt-8 grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+
           {plans.map((p) => (
             <div
               key={p.name}
@@ -142,24 +184,8 @@ function PricingPage() {
             Questions we get a lot
           </h2>
           <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-card">
-            {[
-              {
-                q: "How does the Adsterra integration work?",
-                a: "Connect your Adsterra API key in Settings. AdProfitly syncs reports on your schedule and ingests them into your dashboard automatically.",
-              },
-              {
-                q: "Can I switch plans anytime?",
-                a: "Yes. Upgrade or downgrade whenever. Changes prorate to the day.",
-              },
-              {
-                q: "Do you offer volume discounts?",
-                a: "Enterprise pricing is based on revenue tracked and features required. Talk to sales for a custom quote.",
-              },
-              {
-                q: "Is my data secure?",
-                a: "AdProfitly is SOC 2 Type II ready with encryption in transit and at rest, RBAC, and full audit logs.",
-              },
-            ].map((f) => (
+            {faqs.map((f) => (
+
               <div key={f.q} className="p-6">
                 <h3 className="font-display font-semibold">{f.q}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{f.a}</p>

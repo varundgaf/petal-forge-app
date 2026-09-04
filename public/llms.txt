@@ -1,0 +1,13 @@
+# AdProfitly
+
+> Enterprise ad monetization platform: unified revenue analytics, multi-network monetization, publisher management, verification and payouts.
+
+AdProfitly gives publishers and revenue operators one console for real-time earnings data, site and ad-unit management, traffic quality signals, and weekly payouts.
+
+## Pages
+
+- [Home](/): Platform overview, features and revenue dashboard highlights.
+- [Features](/features): Revenue analytics, campaign management, RBAC, audit logs and integrations.
+- [Pricing](/pricing): Starter, Growth and Enterprise plans plus common questions.
+- [About](/about): Mission, product philosophy and company numbers.
+- [Contact](/contact): Sales, support and partnership enquiries.

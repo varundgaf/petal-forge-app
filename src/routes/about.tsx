@@ -18,7 +18,9 @@ export const Route = createFileRoute("/about")({
         property: "og:description",
         content: "Enterprise revenue console for ad publishers and advertisers.",
       },
+      { property: "og:url", content: "https://adprofitly.com/about" },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/about" }],
   }),
 });
 
@@ -40,7 +42,13 @@ function AboutPage() {
       </section>
 
       <section className="py-20">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold tracking-tight">
+            What we believe about revenue tooling
+          </h2>
+        </div>
+        <div className="mx-auto mt-10 grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+
           {[
             {
               t: "Live over batch",

@@ -31,7 +31,9 @@ export const Route = createFileRoute("/features")({
         content:
           "Revenue analytics, campaign management, Adsterra sync, and enterprise-grade security.",
       },
+      { property: "og:url", content: "https://adprofitly.com/features" },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/features" }],
   }),
 });
 
