@@ -19,7 +19,9 @@ export const Route = createFileRoute("/pricing")({
         property: "og:description",
         content: "Simple, revenue-scaled pricing for publishers and advertisers.",
       },
+      { property: "og:url", content: "https://adprofitly.com/pricing" },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/pricing" }],
   }),
 });
 

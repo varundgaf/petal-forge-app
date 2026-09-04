@@ -18,7 +18,9 @@ export const Route = createFileRoute("/about")({
         property: "og:description",
         content: "Enterprise revenue console for ad publishers and advertisers.",
       },
+      { property: "og:url", content: "https://adprofitly.com/about" },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/about" }],
   }),
 });
 

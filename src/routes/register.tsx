@@ -20,7 +20,11 @@ export const Route = createFileRoute("/register")({
         content: "Create your AdProfitly account. Free 14-day trial. No credit card.",
       },
       { name: "robots", content: "noindex" },
+      { property: "og:url", content: "https://adprofitly.com/register" },
+      { property: "og:title", content: "Create your AdProfitly account" },
+      { property: "og:description", content: "Start tracking ad revenue with a free 14-day trial." },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/register" }],
   }),
 });
 

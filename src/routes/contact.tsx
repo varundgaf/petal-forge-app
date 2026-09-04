@@ -22,7 +22,9 @@ export const Route = createFileRoute("/contact")({
         property: "og:description",
         content: "Reach sales, support, or partnerships. One business day response.",
       },
+      { property: "og:url", content: "https://adprofitly.com/contact" },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/contact" }],
   }),
 });
 

@@ -15,7 +15,12 @@ export const Route = createFileRoute("/verify-email")({
     meta: [
       { title: "Verify email — AdProfitly" },
       { name: "robots", content: "noindex" },
+      { name: "description", content: "Confirm your email address to complete your AdProfitly registration and start managing your ad revenue." },
+      { property: "og:url", content: "https://adprofitly.com/verify-email" },
+      { property: "og:title", content: "Verify your AdProfitly email" },
+      { property: "og:description", content: "Confirm your address to finish setting up your account." },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/verify-email" }],
   }),
 });
 

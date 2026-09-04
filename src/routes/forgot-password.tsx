@@ -14,7 +14,12 @@ export const Route = createFileRoute("/forgot-password")({
     meta: [
       { title: "Reset password — AdProfitly" },
       { name: "robots", content: "noindex" },
+      { name: "description", content: "Request a password reset link for your AdProfitly account to regain access to your monetization dashboard." },
+      { property: "og:url", content: "https://adprofitly.com/forgot-password" },
+      { property: "og:title", content: "Reset your AdProfitly password" },
+      { property: "og:description", content: "Request a secure password reset link for your account." },
     ],
+    links: [{ rel: "canonical", href: "https://adprofitly.com/forgot-password" }],
   }),
 });
 
