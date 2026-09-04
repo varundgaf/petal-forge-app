@@ -190,6 +190,45 @@ function TrafficQualityPage() {
     }).sort((a, b) => b.impressions - a.impressions);
     const topGeoShare = geoRows.length ? pct(geoRows[0].impressions, totals.impressions) : 0;
 
+    // Bot / proxy / duplicate-IP signals
+    const botImpressions = win.reduce((s, r) => s + Number(r.bot_impressions ?? 0), 0);
+    const proxyImpressions = win.reduce((s, r) => s + Number(r.proxy_impressions ?? 0), 0);
+    const duplicateClicks = win.reduce((s, r) => s + Number(r.duplicate_ip_clicks ?? 0), 0);
+    const uniqueVisitors = win.reduce((s, r) => s + Number(r.unique_visitors ?? 0), 0);
+    const hasBotData = win.some((r) => r.bot_impressions !== null);
+    const hasProxyData = win.some((r) => r.proxy_impressions !== null);
+    const hasDupData = win.some((r) => r.duplicate_ip_clicks !== null);
+    const botPct = pct(botImpressions, Math.max(totals.impressions, 1));
+    const proxyPct = pct(proxyImpressions, Math.max(totals.impressions, 1));
+    const dupPct = pct(duplicateClicks, Math.max(totals.clicks, 1));
+
+    // Device / browser / OS breakdown
+    const breakdown = (key: "device" | "browser" | "os") => {
+      const map = new Map<string, { impressions: number; clicks: number }>();
+      for (const r of win) {
+        const k = (r[key] ?? "").trim();
+        if (!k) continue;
+        const c = map.get(k) ?? { impressions: 0, clicks: 0 };
+        c.impressions += Number(r.impressions ?? 0);
+        c.clicks += Number(r.clicks ?? 0);
+        map.set(k, c);
+      }
+      const total = Array.from(map.values()).reduce((s, v) => s + v.impressions, 0);
+      return Array.from(map, ([name, v]) => ({
+        name,
+        impressions: v.impressions,
+        clicks: v.clicks,
+        ctr: ctrOf(v.impressions, v.clicks),
+        share: pct(v.impressions, Math.max(total, 1)),
+      })).sort((a, b) => b.impressions - a.impressions);
+    };
+    const deviceRows = breakdown("device");
+    const browserRows = breakdown("browser");
+    const osRows = breakdown("os");
+    const topDeviceShare = deviceRows.length ? deviceRows[0].share : 0;
+
+
+
     // Score
     let deductions = 0;
     if (hasData) {
