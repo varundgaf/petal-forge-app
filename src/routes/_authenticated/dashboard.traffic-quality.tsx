@@ -686,23 +686,47 @@ function TrafficQualityPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="mb-4 font-display text-lg font-semibold">Devices</h2>
-          <ul className="space-y-3">
-            {["Mobile", "Desktop", "Tablet"].map((d) => (
-              <li key={d} className="flex items-center justify-between text-sm">
-                <span className="font-medium">{d}</span>
-                <span className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="space-y-6">
+          {(
+            [
+              { title: "Devices", rows: model.deviceRows },
+              { title: "Browsers", rows: model.browserRows },
+              { title: "Operating Systems", rows: model.osRows },
+            ] as const
+          ).map((section) => (
+            <div key={section.title} className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="mb-4 font-display text-lg font-semibold">{section.title}</h2>
+              {section.rows.length === 0 ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="h-2 w-2 rounded-full bg-muted-foreground" />
-                  Data collection required
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Device-level attribution is not recorded yet. This section will populate automatically once device
-            data is available.
-          </p>
+                  {isLoading ? "Loading…" : "Data collection required"}
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {section.rows.slice(0, 6).map((d) => {
+                    const s: Status = d.ctr > 6 ? "risk" : d.ctr > 4 ? "attention" : "normal";
+                    return (
+                      <li key={d.name} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium capitalize">{d.name}</span>
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {d.impressions.toLocaleString()} imp · {d.ctr.toFixed(2)}% CTR ·{" "}
+                            <span className={STATUS_META[s].text}>{STATUS_META[s].label}</span>
+                          </span>
+                        </div>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${d.share}%` }} />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          {d.share.toFixed(1)}% of impressions · {d.clicks.toLocaleString()} clicks
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
