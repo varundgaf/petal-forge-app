@@ -92,7 +92,11 @@ function PricingPage() {
       </section>
 
       <section className="py-16">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold tracking-tight">Plans and pricing</h2>
+        </div>
+        <div className="mx-auto mt-8 grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+
           {plans.map((p) => (
             <div
               key={p.name}

@@ -176,9 +176,10 @@ function LogoStrip() {
   return (
     <section className="border-y border-border/60 bg-surface py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+        <h2 className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
           Trusted by revenue teams at
-        </p>
+        </h2>
+
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 opacity-70">
           {["MEDIAWAVE", "PIXELFORGE", "REVENUE.CO", "STRATOS", "NORTHBEAM", "ADHIVE", "OUTLIER"].map(
             (n) => (
