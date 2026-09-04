@@ -519,25 +519,31 @@ function ForWho() {
       title: "Every ad unit, every dollar, tracked.",
       body: "Sites, domains, ad units, traffic sources, countries, devices — all in one live dashboard with payouts.",
       link: "/features",
+      linkLabel: "View publisher features",
     },
     {
       role: "For Operators",
       title: "Run the platform end-to-end.",
       body: "Approve publishers, verify sites, assign revenue shares, and manage payouts from one console.",
       link: "/features",
+      linkLabel: "Explore operator tools",
     },
     {
       role: "For Admin Teams",
       title: "Total control, zero surprises.",
       body: "Users, KYC, plans, coupons, CMS, roles, permissions, audit logs, and system health — one click away.",
       link: "/features",
+      linkLabel: "See admin controls",
     },
   ];
 
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-4 md:grid-cols-3">
+        <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          Built for every team in your revenue stack
+        </h2>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
           {cards.map((c) => (
             <div
               key={c.role}
@@ -556,7 +562,7 @@ function ForWho() {
                 to={c.link}
                 className="mt-6 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
               >
-                Learn more <ArrowRight className="h-4 w-4" />
+                {c.linkLabel} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           ))}
@@ -565,6 +571,7 @@ function ForWho() {
     </section>
   );
 }
+
 
 function StatsRibbon() {
   return (
