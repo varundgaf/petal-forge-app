@@ -240,6 +240,9 @@ function TrafficQualityPage() {
         deductions += Math.min(WEIGHTS.spike, ((spikeRatio - 2) / 3) * WEIGHTS.spike);
       if (topGeoShare > 80)
         deductions += Math.min(WEIGHTS.geo, ((topGeoShare - 80) / 20) * WEIGHTS.geo);
+      if (hasBotData) deductions += Math.min(WEIGHTS.automated, (botPct / 15) * WEIGHTS.automated);
+      if (deviceRows.length && topDeviceShare > 90)
+        deductions += Math.min(WEIGHTS.device, ((topDeviceShare - 90) / 10) * WEIGHTS.device);
     }
     const score = hasData ? Math.max(0, Math.min(100, Math.round(100 - deductions))) : null;
 
