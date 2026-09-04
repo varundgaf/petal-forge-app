@@ -413,9 +413,17 @@ function TrafficQualityPage() {
     },
     {
       label: "Device Anomaly",
-      value: "Not available",
-      status: "unknown",
-      hint: "Device-level breakdown is not collected yet.",
+      value: model.deviceRows.length
+        ? `${model.topDeviceShare.toFixed(0)}% ${model.deviceRows[0].name}`
+        : "Data collection required",
+      status: !model.deviceRows.length
+        ? "unknown"
+        : model.topDeviceShare > 95
+          ? "risk"
+          : model.topDeviceShare > 90
+            ? "attention"
+            : "normal",
+      hint: "Concentration of impressions on a single device type.",
     },
   ];
 
