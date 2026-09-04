@@ -326,10 +326,53 @@ function TrafficQualityPage() {
     },
     {
       label: "Suspected Automated Traffic",
-      value: "Not available",
-      status: "unknown",
-      hint: "Bot & datacenter signals require detection data collection.",
+      value: model.hasBotData
+        ? `${model.botImpressions.toLocaleString()} (${model.botPct.toFixed(1)}%)`
+        : "Data collection required",
+      status: !model.hasBotData
+        ? "unknown"
+        : model.botPct > 10
+          ? "risk"
+          : model.botPct > 5
+            ? "attention"
+            : "normal",
+      hint: "Bot & datacenter impressions detected in this range.",
     },
+    {
+      label: "VPN / Proxy Traffic",
+      value: model.hasProxyData
+        ? `${model.proxyImpressions.toLocaleString()} (${model.proxyPct.toFixed(1)}%)`
+        : "Data collection required",
+      status: !model.hasProxyData
+        ? "unknown"
+        : model.proxyPct > 8
+          ? "risk"
+          : model.proxyPct > 3
+            ? "attention"
+            : "normal",
+      hint: "Impressions from proxy, VPN or datacenter ranges.",
+    },
+    {
+      label: "Duplicate IP Clicks",
+      value: model.hasDupData
+        ? `${model.duplicateClicks.toLocaleString()} (${model.dupPct.toFixed(1)}%)`
+        : "Data collection required",
+      status: !model.hasDupData
+        ? "unknown"
+        : model.dupPct > 10
+          ? "risk"
+          : model.dupPct > 4
+            ? "attention"
+            : "normal",
+      hint: "Repeat clicks recorded from the same IP address.",
+    },
+    {
+      label: "Unique Visitors",
+      value: model.uniqueVisitors > 0 ? model.uniqueVisitors.toLocaleString() : "Data collection required",
+      status: model.uniqueVisitors > 0 ? "normal" : "unknown",
+      hint: "Distinct visitors recorded across your inventory.",
+    },
+
     {
       label: "CTR Anomaly",
       value: model.baseCtr > 0 ? `${model.ctrDelta >= 0 ? "+" : ""}${model.ctrDelta.toFixed(1)}%` : "Data collection required",
