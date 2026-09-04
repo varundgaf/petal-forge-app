@@ -184,24 +184,8 @@ function PricingPage() {
             Questions we get a lot
           </h2>
           <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-card">
-            {[
-              {
-                q: "How does the Adsterra integration work?",
-                a: "Connect your Adsterra API key in Settings. AdProfitly syncs reports on your schedule and ingests them into your dashboard automatically.",
-              },
-              {
-                q: "Can I switch plans anytime?",
-                a: "Yes. Upgrade or downgrade whenever. Changes prorate to the day.",
-              },
-              {
-                q: "Do you offer volume discounts?",
-                a: "Enterprise pricing is based on revenue tracked and features required. Talk to sales for a custom quote.",
-              },
-              {
-                q: "Is my data secure?",
-                a: "AdProfitly is SOC 2 Type II ready with encryption in transit and at rest, RBAC, and full audit logs.",
-              },
-            ].map((f) => (
+            {faqs.map((f) => (
+
               <div key={f.q} className="p-6">
                 <h3 className="font-display font-semibold">{f.q}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{f.a}</p>
