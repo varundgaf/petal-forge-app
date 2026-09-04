@@ -43,13 +43,22 @@ type Row = {
   clicks: number;
   revenue: number;
   country: string | null;
+  device: string | null;
+  browser: string | null;
+  os: string | null;
+  bot_impressions: number | null;
+  proxy_impressions: number | null;
+  duplicate_ip_clicks: number | null;
+  unique_visitors: number | null;
 };
 
 async function fetchTrafficQuality(): Promise<Row[]> {
   const since = format(subDays(new Date(), 89), "yyyy-MM-dd");
   const { data, error } = await supabase
     .from("revenue_events")
-    .select("date, pageviews, impressions, clicks, revenue, country")
+    .select(
+      "date, pageviews, impressions, clicks, revenue, country, device, browser, os, bot_impressions, proxy_impressions, duplicate_ip_clicks, unique_visitors",
+    )
     .gte("date", since)
     .order("date", { ascending: true });
   if (error) throw error;
