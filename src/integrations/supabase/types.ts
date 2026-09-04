@@ -352,44 +352,65 @@ export type Database = {
       revenue_events: {
         Row: {
           ad_unit_id: string | null
+          bot_impressions: number
+          browser: string | null
           clicks: number
           country: string | null
           cpm: number
           created_at: string
           date: string
+          device: string | null
+          duplicate_ip_clicks: number
           id: string
           impressions: number
+          os: string | null
           pageviews: number
+          proxy_impressions: number
           revenue: number
           site_id: string | null
+          unique_visitors: number
           user_id: string
         }
         Insert: {
           ad_unit_id?: string | null
+          bot_impressions?: number
+          browser?: string | null
           clicks?: number
           country?: string | null
           cpm?: number
           created_at?: string
           date: string
+          device?: string | null
+          duplicate_ip_clicks?: number
           id?: string
           impressions?: number
+          os?: string | null
           pageviews?: number
+          proxy_impressions?: number
           revenue?: number
           site_id?: string | null
+          unique_visitors?: number
           user_id: string
         }
         Update: {
           ad_unit_id?: string | null
+          bot_impressions?: number
+          browser?: string | null
           clicks?: number
           country?: string | null
           cpm?: number
           created_at?: string
           date?: string
+          device?: string | null
+          duplicate_ip_clicks?: number
           id?: string
           impressions?: number
+          os?: string | null
           pageviews?: number
+          proxy_impressions?: number
           revenue?: number
           site_id?: string | null
+          unique_visitors?: number
           user_id?: string
         }
         Relationships: [

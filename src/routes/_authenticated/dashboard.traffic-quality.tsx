@@ -43,13 +43,22 @@ type Row = {
   clicks: number;
   revenue: number;
   country: string | null;
+  device: string | null;
+  browser: string | null;
+  os: string | null;
+  bot_impressions: number | null;
+  proxy_impressions: number | null;
+  duplicate_ip_clicks: number | null;
+  unique_visitors: number | null;
 };
 
 async function fetchTrafficQuality(): Promise<Row[]> {
   const since = format(subDays(new Date(), 89), "yyyy-MM-dd");
   const { data, error } = await supabase
     .from("revenue_events")
-    .select("date, pageviews, impressions, clicks, revenue, country")
+    .select(
+      "date, pageviews, impressions, clicks, revenue, country, device, browser, os, bot_impressions, proxy_impressions, duplicate_ip_clicks, unique_visitors",
+    )
     .gte("date", since)
     .order("date", { ascending: true });
   if (error) throw error;
@@ -181,6 +190,45 @@ function TrafficQualityPage() {
     }).sort((a, b) => b.impressions - a.impressions);
     const topGeoShare = geoRows.length ? pct(geoRows[0].impressions, totals.impressions) : 0;
 
+    // Bot / proxy / duplicate-IP signals
+    const botImpressions = win.reduce((s, r) => s + Number(r.bot_impressions ?? 0), 0);
+    const proxyImpressions = win.reduce((s, r) => s + Number(r.proxy_impressions ?? 0), 0);
+    const duplicateClicks = win.reduce((s, r) => s + Number(r.duplicate_ip_clicks ?? 0), 0);
+    const uniqueVisitors = win.reduce((s, r) => s + Number(r.unique_visitors ?? 0), 0);
+    const hasBotData = win.some((r) => r.bot_impressions !== null);
+    const hasProxyData = win.some((r) => r.proxy_impressions !== null);
+    const hasDupData = win.some((r) => r.duplicate_ip_clicks !== null);
+    const botPct = pct(botImpressions, Math.max(totals.impressions, 1));
+    const proxyPct = pct(proxyImpressions, Math.max(totals.impressions, 1));
+    const dupPct = pct(duplicateClicks, Math.max(totals.clicks, 1));
+
+    // Device / browser / OS breakdown
+    const breakdown = (key: "device" | "browser" | "os") => {
+      const map = new Map<string, { impressions: number; clicks: number }>();
+      for (const r of win) {
+        const k = (r[key] ?? "").trim();
+        if (!k) continue;
+        const c = map.get(k) ?? { impressions: 0, clicks: 0 };
+        c.impressions += Number(r.impressions ?? 0);
+        c.clicks += Number(r.clicks ?? 0);
+        map.set(k, c);
+      }
+      const total = Array.from(map.values()).reduce((s, v) => s + v.impressions, 0);
+      return Array.from(map, ([name, v]) => ({
+        name,
+        impressions: v.impressions,
+        clicks: v.clicks,
+        ctr: ctrOf(v.impressions, v.clicks),
+        share: pct(v.impressions, Math.max(total, 1)),
+      })).sort((a, b) => b.impressions - a.impressions);
+    };
+    const deviceRows = breakdown("device");
+    const browserRows = breakdown("browser");
+    const osRows = breakdown("os");
+    const topDeviceShare = deviceRows.length ? deviceRows[0].share : 0;
+
+
+
     // Score
     let deductions = 0;
     if (hasData) {
@@ -192,6 +240,9 @@ function TrafficQualityPage() {
         deductions += Math.min(WEIGHTS.spike, ((spikeRatio - 2) / 3) * WEIGHTS.spike);
       if (topGeoShare > 80)
         deductions += Math.min(WEIGHTS.geo, ((topGeoShare - 80) / 20) * WEIGHTS.geo);
+      if (hasBotData) deductions += Math.min(WEIGHTS.automated, (botPct / 15) * WEIGHTS.automated);
+      if (deviceRows.length && topDeviceShare > 90)
+        deductions += Math.min(WEIGHTS.device, ((topDeviceShare - 90) / 10) * WEIGHTS.device);
     }
     const score = hasData ? Math.max(0, Math.min(100, Math.round(100 - deductions))) : null;
 
@@ -225,6 +276,20 @@ function TrafficQualityPage() {
       suspiciousPct,
       geoRows,
       topGeoShare,
+      deviceRows,
+      browserRows,
+      osRows,
+      topDeviceShare,
+      botImpressions,
+      botPct,
+      hasBotData,
+      proxyImpressions,
+      proxyPct,
+      hasProxyData,
+      duplicateClicks,
+      dupPct,
+      hasDupData,
+      uniqueVisitors,
       chart,
     };
   }, [data, range.days]);
@@ -261,10 +326,53 @@ function TrafficQualityPage() {
     },
     {
       label: "Suspected Automated Traffic",
-      value: "Not available",
-      status: "unknown",
-      hint: "Bot & datacenter signals require detection data collection.",
+      value: model.hasBotData
+        ? `${model.botImpressions.toLocaleString()} (${model.botPct.toFixed(1)}%)`
+        : "Data collection required",
+      status: !model.hasBotData
+        ? "unknown"
+        : model.botPct > 10
+          ? "risk"
+          : model.botPct > 5
+            ? "attention"
+            : "normal",
+      hint: "Bot & datacenter impressions detected in this range.",
     },
+    {
+      label: "VPN / Proxy Traffic",
+      value: model.hasProxyData
+        ? `${model.proxyImpressions.toLocaleString()} (${model.proxyPct.toFixed(1)}%)`
+        : "Data collection required",
+      status: !model.hasProxyData
+        ? "unknown"
+        : model.proxyPct > 8
+          ? "risk"
+          : model.proxyPct > 3
+            ? "attention"
+            : "normal",
+      hint: "Impressions from proxy, VPN or datacenter ranges.",
+    },
+    {
+      label: "Duplicate IP Clicks",
+      value: model.hasDupData
+        ? `${model.duplicateClicks.toLocaleString()} (${model.dupPct.toFixed(1)}%)`
+        : "Data collection required",
+      status: !model.hasDupData
+        ? "unknown"
+        : model.dupPct > 10
+          ? "risk"
+          : model.dupPct > 4
+            ? "attention"
+            : "normal",
+      hint: "Repeat clicks recorded from the same IP address.",
+    },
+    {
+      label: "Unique Visitors",
+      value: model.uniqueVisitors > 0 ? model.uniqueVisitors.toLocaleString() : "Data collection required",
+      status: model.uniqueVisitors > 0 ? "normal" : "unknown",
+      hint: "Distinct visitors recorded across your inventory.",
+    },
+
     {
       label: "CTR Anomaly",
       value: model.baseCtr > 0 ? `${model.ctrDelta >= 0 ? "+" : ""}${model.ctrDelta.toFixed(1)}%` : "Data collection required",
@@ -305,9 +413,17 @@ function TrafficQualityPage() {
     },
     {
       label: "Device Anomaly",
-      value: "Not available",
-      status: "unknown",
-      hint: "Device-level breakdown is not collected yet.",
+      value: model.deviceRows.length
+        ? `${model.topDeviceShare.toFixed(0)}% ${model.deviceRows[0].name}`
+        : "Data collection required",
+      status: !model.deviceRows.length
+        ? "unknown"
+        : model.topDeviceShare > 95
+          ? "risk"
+          : model.topDeviceShare > 90
+            ? "attention"
+            : "normal",
+      hint: "Concentration of impressions on a single device type.",
     },
   ];
 
@@ -517,8 +633,8 @@ function TrafficQualityPage() {
           <p className="mt-2 text-sm text-muted-foreground">{recommendation.body}</p>
           <p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            VPN/proxy, bot detection, duplicate IP and advanced fraud signals are not available yet — data
-            collection required.
+            Bot, VPN/proxy, duplicate-IP and device signals are shown where recorded; ranges without those
+            signals display “Data collection required”.
           </p>
         </div>
       </div>
@@ -570,23 +686,47 @@ function TrafficQualityPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="mb-4 font-display text-lg font-semibold">Devices</h2>
-          <ul className="space-y-3">
-            {["Mobile", "Desktop", "Tablet"].map((d) => (
-              <li key={d} className="flex items-center justify-between text-sm">
-                <span className="font-medium">{d}</span>
-                <span className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="space-y-6">
+          {(
+            [
+              { title: "Devices", rows: model.deviceRows },
+              { title: "Browsers", rows: model.browserRows },
+              { title: "Operating Systems", rows: model.osRows },
+            ] as const
+          ).map((section) => (
+            <div key={section.title} className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="mb-4 font-display text-lg font-semibold">{section.title}</h2>
+              {section.rows.length === 0 ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="h-2 w-2 rounded-full bg-muted-foreground" />
-                  Data collection required
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Device-level attribution is not recorded yet. This section will populate automatically once device
-            data is available.
-          </p>
+                  {isLoading ? "Loading…" : "Data collection required"}
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {section.rows.slice(0, 6).map((d) => {
+                    const s: Status = d.ctr > 6 ? "risk" : d.ctr > 4 ? "attention" : "normal";
+                    return (
+                      <li key={d.name} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium capitalize">{d.name}</span>
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {d.impressions.toLocaleString()} imp · {d.ctr.toFixed(2)}% CTR ·{" "}
+                            <span className={STATUS_META[s].text}>{STATUS_META[s].label}</span>
+                          </span>
+                        </div>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${d.share}%` }} />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          {d.share.toFixed(1)}% of impressions · {d.clicks.toLocaleString()} clicks
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
