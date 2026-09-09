@@ -3,7 +3,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Wallet, Plus, Info } from "lucide-react";
+import {
+  Wallet,
+  Plus,
+  Info,
+  Check,
+  Loader2,
+  FileCheck2,
+  ShieldCheck,
+  Banknote,
+  CircleCheckBig,
+  XCircle,
+  ChevronDown,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-store";
 import { Button } from "@/components/ui/button";
