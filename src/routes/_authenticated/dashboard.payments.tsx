@@ -252,6 +252,10 @@ function PaymentsPage() {
   const { data: payments, isLoading } = useQuery({ queryKey: ["payments"], queryFn: fetchPayments });
   const { data: revenue } = useQuery({ queryKey: ["revenue-total"], queryFn: fetchRevenueTotal });
   const [open, setOpen] = useState(false);
+  const [tracked, setTracked] = useState<string | null>(null);
+  const activePayment = payments?.find((p) =>
+    ["pending", "processing", "approved"].includes(p.status),
+  );
   const [form, setForm] = useState({
     amount: 0,
     method: (profile?.payment_method ?? "paypal") as (typeof METHODS)[number],
@@ -444,29 +448,52 @@ function PaymentsPage() {
               </tr>
             ) : (
               payments?.map((p) => (
-                <tr key={p.id} className="border-b border-border/50 last:border-0">
-                  <td className="px-6 py-4 text-muted-foreground">
-                    {format(new Date(p.requested_at), "MMM d, yyyy")}
-                  </td>
-                  <td className="px-6 py-4 font-mono font-medium">
-                    ${Number(p.amount).toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 uppercase">{p.method.replace("_", " ")}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={statusVariant(p.status)} className="capitalize">
-                      {p.status}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 font-mono text-xs text-muted-foreground">
-                    {p.reference_id ?? "—"}
-                  </td>
-                  <td className="px-6 py-4 text-muted-foreground">
-                    {p.notes ??
-                      (p.paid_at
-                        ? `Paid ${format(new Date(p.paid_at), "MMM d")}`
-                        : p.destination ?? "—")}
-                  </td>
-                </tr>
+                <>
+                  <tr
+                    key={p.id}
+                    className="cursor-pointer border-b border-border/50 transition-colors hover:bg-muted/20"
+                    onClick={() => setTracked(tracked === p.id ? null : p.id)}
+                  >
+                    <td className="px-6 py-4 text-muted-foreground">
+                      {format(new Date(p.requested_at), "MMM d, yyyy")}
+                    </td>
+                    <td className="px-6 py-4 font-mono font-medium">
+                      ${Number(p.amount).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 uppercase">{p.method.replace("_", " ")}</td>
+                    <td className="px-6 py-4">
+                      <Badge variant={statusVariant(p.status)} className="capitalize">
+                        {p.status}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-xs text-muted-foreground">
+                      {p.reference_id ?? "—"}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground">
+                      <span className="inline-flex items-center gap-2">
+                        {p.notes ??
+                          (p.paid_at
+                            ? `Paid ${format(new Date(p.paid_at), "MMM d")}`
+                            : p.destination ?? "—")}
+                        <ChevronDown
+                          className={`h-4 w-4 shrink-0 transition-transform ${
+                            tracked === p.id ? "rotate-180" : ""
+                          }`}
+                        />
+                      </span>
+                    </td>
+                  </tr>
+                  {tracked === p.id && (
+                    <tr key={`${p.id}-track`} className="border-b border-border/50 bg-muted/10">
+                      <td colSpan={6} className="px-6 py-6">
+                        <p className="mb-4 font-mono text-xs uppercase tracking-[0.3em] text-primary">
+                          Tracking
+                        </p>
+                        <PayoutTimeline payment={p} />
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))
             )}
           </tbody>
