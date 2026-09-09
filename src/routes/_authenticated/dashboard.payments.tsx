@@ -414,6 +414,8 @@ function PaymentsPage() {
         </div>
       </div>
 
+      {activePayment && <PayoutTracker payment={activePayment} />}
+
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/30">
