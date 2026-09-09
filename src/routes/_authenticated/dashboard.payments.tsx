@@ -77,6 +77,175 @@ function statusVariant(s: string): "default" | "secondary" | "outline" | "destru
   }
 }
 
+type PaymentRow = Awaited<ReturnType<typeof fetchPayments>>[number];
+
+const STAGES = [
+  {
+    key: "requested",
+    label: "Request received",
+    icon: FileCheck2,
+    hint: "Payout request logged against your available balance.",
+  },
+  {
+    key: "processed",
+    label: "Payment processed",
+    icon: Loader2,
+    hint: "Earnings validated and traffic quality cleared.",
+  },
+  {
+    key: "approved",
+    label: "Manager approved",
+    icon: ShieldCheck,
+    hint: "Finance manager signed off on the payout.",
+  },
+  {
+    key: "assigned",
+    label: "Payout assigned",
+    icon: Banknote,
+    hint: "Funds queued with the payment provider.",
+  },
+  {
+    key: "paid",
+    label: "Payment sent",
+    icon: CircleCheckBig,
+    hint: "Money released to your destination account.",
+  },
+] as const;
+
+/** Index of the last completed stage for a payout (-1 = nothing done yet). */
+function stageIndex(status: string) {
+  switch (status) {
+    case "pending":
+      return 0;
+    case "processing":
+      return 1;
+    case "approved":
+      return 3;
+    case "paid":
+      return 4;
+    default:
+      return 0;
+  }
+}
+
+function addDays(date: Date, days: number) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function PayoutTimeline({ payment }: { payment: PaymentRow }) {
+  const failed = payment.status === "rejected" || payment.status === "failed";
+  const current = stageIndex(payment.status);
+  const requested = new Date(payment.requested_at);
+  const eta = [0, 1, 2, 2, 3].map((d) => addDays(requested, d));
+
+  return (
+    <ol className="space-y-0">
+      {STAGES.map((stage, i) => {
+        const done = !failed && i <= current;
+        const active = !failed && i === current && payment.status !== "paid";
+        const Icon = failed && i > current ? XCircle : done ? Check : stage.icon;
+        return (
+          <li key={stage.key} className="flex gap-4">
+            <div className="flex flex-col items-center">
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
+                  failed && i > current
+                    ? "border-destructive/40 bg-destructive/10 text-destructive"
+                    : done
+                      ? "border-primary/40 bg-primary/15 text-primary"
+                      : "border-border bg-muted/30 text-muted-foreground"
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${active ? "animate-pulse" : ""}`} />
+              </span>
+              {i < STAGES.length - 1 && (
+                <span
+                  className={`w-px flex-1 ${done && i < current ? "bg-primary/40" : "bg-border"}`}
+                />
+              )}
+            </div>
+            <div className={`pb-6 ${i === STAGES.length - 1 ? "pb-0" : ""}`}>
+              <div className="flex flex-wrap items-center gap-2">
+                <p
+                  className={`text-sm font-medium ${done ? "" : "text-muted-foreground"}`}
+                >
+                  {stage.label}
+                </p>
+                {active && (
+                  <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                    In progress
+                  </Badge>
+                )}
+                {failed && i > current && (
+                  <Badge variant="destructive" className="text-[10px] uppercase tracking-wider">
+                    Stopped
+                  </Badge>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{stage.hint}</p>
+              <p className="mt-1 font-mono text-[11px] text-muted-foreground/80">
+                {done
+                  ? stage.key === "paid" && payment.paid_at
+                    ? format(new Date(payment.paid_at), "MMM d, yyyy · HH:mm")
+                    : format(eta[i], "MMM d, yyyy")
+                  : failed
+                    ? "—"
+                    : `Expected ${format(eta[i], "MMM d, yyyy")}`}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function PayoutTracker({ payment }: { payment: PaymentRow }) {
+  const current = stageIndex(payment.status);
+  const pct = ((current + 1) / STAGES.length) * 100;
+  const eta = addDays(new Date(payment.requested_at), 3);
+  return (
+    <div className="rounded-2xl border border-primary/25 bg-primary/[0.04] p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">
+            Payout tracking
+          </p>
+          <p className="mt-2 font-display text-2xl font-semibold">
+            ${Number(payment.amount).toFixed(2)}{" "}
+            <span className="text-sm font-normal uppercase text-muted-foreground">
+              {payment.method.replace("_", " ")}
+            </span>
+          </p>
+          <p className="mt-1 font-mono text-xs text-muted-foreground">
+            {payment.reference_id ?? "—"}
+          </p>
+        </div>
+        <div className="text-right">
+          <Badge variant={statusVariant(payment.status)} className="capitalize">
+            {payment.status}
+          </Badge>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Estimated arrival{" "}
+            <span className="font-mono text-foreground">{format(eta, "MMM d, yyyy")}</span>
+          </p>
+        </div>
+      </div>
+      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-border">
+        <div
+          className="h-full rounded-full bg-primary transition-all duration-700"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <div className="mt-6">
+        <PayoutTimeline payment={payment} />
+      </div>
+    </div>
+  );
+}
+
 function PaymentsPage() {
   const qc = useQueryClient();
   const profile = useAuth((s) => s.profile);
