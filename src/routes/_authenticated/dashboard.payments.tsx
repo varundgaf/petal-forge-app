@@ -120,7 +120,7 @@ function stageIndex(status: string) {
     case "processing":
       return 1;
     case "approved":
-      return 3;
+      return 2;
     case "paid":
       return 4;
     default:
