@@ -85,6 +85,47 @@ export type Database = {
           },
         ]
       }
+      api_sync_logs: {
+        Row: {
+          error_code: string | null
+          finished_at: string | null
+          id: string
+          network_id: string
+          rows_received: number
+          rows_written: number
+          started_at: string
+          status: string
+        }
+        Insert: {
+          error_code?: string | null
+          finished_at?: string | null
+          id?: string
+          network_id: string
+          rows_received?: number
+          rows_written?: number
+          started_at?: string
+          status: string
+        }
+        Update: {
+          error_code?: string | null
+          finished_at?: string | null
+          id?: string
+          network_id?: string
+          rows_received?: number
+          rows_written?: number
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_sync_logs_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "networks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -142,6 +183,115 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      network_stats: {
+        Row: {
+          clicks: number
+          country: string
+          cpm: number
+          created_at: string
+          ctr: number
+          device: string
+          id: string
+          impressions: number
+          network_id: string
+          referrer: string
+          revenue: number
+          smart_link_id: string
+          stat_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          clicks?: number
+          country?: string
+          cpm?: number
+          created_at?: string
+          ctr?: number
+          device?: string
+          id?: string
+          impressions?: number
+          network_id: string
+          referrer?: string
+          revenue?: number
+          smart_link_id: string
+          stat_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          clicks?: number
+          country?: string
+          cpm?: number
+          created_at?: string
+          ctr?: number
+          device?: string
+          id?: string
+          impressions?: number
+          network_id?: string
+          referrer?: string
+          revenue?: number
+          smart_link_id?: string
+          stat_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_stats_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "networks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_stats_smart_link_id_fkey"
+            columns: ["smart_link_id"]
+            isOneToOne: false
+            referencedRelation: "smart_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      networks: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_synced_at: string | null
+          name: string
+          provider_key: string
+          settings: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          name: string
+          provider_key: string
+          settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          name?: string
+          provider_key?: string
+          settings?: Json
+          updated_at?: string
         }
         Relationships: []
       }
@@ -349,6 +499,57 @@ export type Database = {
         }
         Relationships: []
       }
+      publisher_earnings: {
+        Row: {
+          created_at: string
+          earning_date: string
+          gross_revenue: number
+          id: string
+          publisher_revenue: number
+          revenue_share: number
+          smart_link_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          earning_date: string
+          gross_revenue?: number
+          id?: string
+          publisher_revenue?: number
+          revenue_share: number
+          smart_link_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          earning_date?: string
+          gross_revenue?: number
+          id?: string
+          publisher_revenue?: number
+          revenue_share?: number
+          smart_link_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_earnings_smart_link_id_fkey"
+            columns: ["smart_link_id"]
+            isOneToOne: false
+            referencedRelation: "smart_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publisher_earnings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       revenue_events: {
         Row: {
           ad_unit_id: string | null
@@ -484,6 +685,66 @@ export type Database = {
         }
         Relationships: []
       }
+      smart_links: {
+        Row: {
+          created_at: string
+          destination_url: string
+          id: string
+          name: string
+          network_id: string
+          network_placement_id: string | null
+          placement_sub_id: string
+          slug: string
+          status: string
+          traffic_source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          destination_url: string
+          id?: string
+          name: string
+          network_id: string
+          network_placement_id?: string | null
+          placement_sub_id: string
+          slug: string
+          status?: string
+          traffic_source: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          destination_url?: string
+          id?: string
+          name?: string
+          network_id?: string
+          network_placement_id?: string | null
+          placement_sub_id?: string
+          slug?: string
+          status?: string
+          traffic_source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_links_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "networks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           body: string | null
@@ -554,6 +815,63 @@ export type Database = {
             columns: ["ticket_id"]
             isOneToOne: false
             referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traffic_events: {
+        Row: {
+          country: string | null
+          device: string | null
+          id: string
+          ip_fingerprint: string
+          is_suspicious: boolean
+          occurred_at: string
+          referrer_host: string | null
+          smart_link_id: string
+          suspicion_reason: string | null
+          user_agent_class: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          device?: string | null
+          id?: string
+          ip_fingerprint: string
+          is_suspicious?: boolean
+          occurred_at?: string
+          referrer_host?: string | null
+          smart_link_id: string
+          suspicion_reason?: string | null
+          user_agent_class?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          device?: string | null
+          id?: string
+          ip_fingerprint?: string
+          is_suspicious?: boolean
+          occurred_at?: string
+          referrer_host?: string | null
+          smart_link_id?: string
+          suspicion_reason?: string | null
+          user_agent_class?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traffic_events_smart_link_id_fkey"
+            columns: ["smart_link_id"]
+            isOneToOne: false
+            referencedRelation: "smart_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

@@ -23,6 +23,7 @@ import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as GoSlugRouteImport } from './routes/go.$slug'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
@@ -116,6 +117,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const GoSlugRoute = GoSlugRouteImport.update({
+  id: '/go/$slug',
+  path: '/go/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
@@ -259,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/go/$slug': typeof GoSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/ad-units': typeof AuthenticatedDashboardAdUnitsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/admin': typeof AdminIndexRoute
   '/admin/login': typeof AdminLoginRoute
+  '/go/$slug': typeof GoSlugRoute
   '/dashboard/ad-units': typeof AuthenticatedDashboardAdUnitsRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/payments': typeof AuthenticatedDashboardPaymentsRoute
@@ -336,6 +344,7 @@ export interface FileRoutesById {
   '/admin/_gated': typeof AdminGatedRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/go/$slug': typeof GoSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/dashboard/ad-units': typeof AuthenticatedDashboardAdUnitsRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -376,6 +385,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/dashboard'
     | '/admin/login'
+    | '/go/$slug'
     | '/admin/'
     | '/dashboard/ad-units'
     | '/dashboard/analytics'
@@ -413,6 +423,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/admin'
     | '/admin/login'
+    | '/go/$slug'
     | '/dashboard/ad-units'
     | '/dashboard/analytics'
     | '/dashboard/payments'
@@ -452,6 +463,7 @@ export interface FileRouteTypes {
     | '/admin/_gated'
     | '/_authenticated/dashboard'
     | '/admin/login'
+    | '/go/$slug'
     | '/admin/'
     | '/_authenticated/dashboard/ad-units'
     | '/_authenticated/dashboard/analytics'
@@ -490,6 +502,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  GoSlugRoute: typeof GoSlugRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
 }
@@ -593,6 +606,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/go/$slug': {
+      id: '/go/$slug'
+      path: '/go/$slug'
+      fullPath: '/go/$slug'
+      preLoaderRoute: typeof GoSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
       id: '/admin/login'
@@ -877,6 +897,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  GoSlugRoute: GoSlugRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
 }
