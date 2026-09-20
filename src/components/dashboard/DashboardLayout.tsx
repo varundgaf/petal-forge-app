@@ -93,7 +93,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col md:pl-64">
+      <div className="flex min-w-0 flex-1 flex-col md:pl-64">
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-money">
@@ -132,7 +132,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>
   );
