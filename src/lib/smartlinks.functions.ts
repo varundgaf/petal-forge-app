@@ -6,10 +6,16 @@ type DateRange = { from: string; to: string };
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const idPattern = /^[0-9a-f-]{36}$/i;
+const MAX_RANGE_DAYS = 366;
 
 function rangeInput(data: DateRange) {
   if (!datePattern.test(data.from) || !datePattern.test(data.to) || data.from > data.to) {
     throw new Error("Invalid date range.");
+  }
+  const from = Date.parse(`${data.from}T00:00:00Z`);
+  const to = Date.parse(`${data.to}T00:00:00Z`);
+  if (!Number.isFinite(from) || !Number.isFinite(to) || (to - from) / 86_400_000 >= MAX_RANGE_DAYS) {
+    throw new Error("Date range cannot exceed 366 days.");
   }
   return data;
 }
@@ -27,6 +33,18 @@ function cleanText(value: string, label: string) {
 
 async function admin() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
+}
+
+async function activeNetwork() {
+  const supabaseAdmin = await admin();
+  const { data, error } = await supabaseAdmin
+    .from("networks")
+    .select("id,provider_key")
+    .eq("provider_key", "adsterra")
+    .eq("is_active", true)
+    .single();
+  if (error || !data) throw new Error("SmartLink network is unavailable.");
+  return data;
 }
 
 export const listSmartLinks = createServerFn({ method: "GET" })
@@ -69,8 +87,9 @@ export const listSmartLinks = createServerFn({ method: "GET" })
 export const listNetworkPlacements = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
+    const network = await activeNetwork();
     const { getSmartLinkProvider } = await import("@/lib/smartlinks/adsterra.server");
-    return getSmartLinkProvider("adsterra").listPlacements();
+    return getSmartLinkProvider(network.provider_key).listPlacements();
   });
 
 export const createSmartLink = createServerFn({ method: "POST" })
@@ -82,13 +101,7 @@ export const createSmartLink = createServerFn({ method: "POST" })
     if (!data.placementId || data.placementId.length > 100) throw new Error("Choose an approved SmartLink placement.");
 
     const supabaseAdmin = await admin();
-    const { data: network, error: networkError } = await supabaseAdmin
-      .from("networks")
-      .select("id,provider_key")
-      .eq("provider_key", "adsterra")
-      .eq("is_active", true)
-      .single();
-    if (networkError || !network) throw new Error("SmartLink network is unavailable.");
+    const network = await activeNetwork();
 
     const { getSmartLinkProvider } = await import("@/lib/smartlinks/adsterra.server");
     const placements = await getSmartLinkProvider(network.provider_key).listPlacements();
@@ -111,7 +124,10 @@ export const createSmartLink = createServerFn({ method: "POST" })
       })
       .select("id,name,slug,status")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("SmartLink creation failed", error);
+      throw new Error("SmartLink could not be created.");
+    }
     return { ...row, branded_url: `https://adprofitly.com/go/${row.slug}` };
   });
 
@@ -170,12 +186,7 @@ export const syncSmartLinkStats = createServerFn({ method: "POST" })
   .inputValidator(rangeInput)
   .handler(async ({ context, data }) => {
     const supabaseAdmin = await admin();
-    const { data: network, error: networkError } = await supabaseAdmin
-      .from("networks")
-      .select("id,provider_key")
-      .eq("provider_key", "adsterra")
-      .single();
-    if (networkError || !network) throw new Error("SmartLink network is unavailable.");
+    const network = await activeNetwork();
 
     const { data: links, error: linksError } = await supabaseAdmin
       .from("smart_links")
@@ -188,9 +199,10 @@ export const syncSmartLinkStats = createServerFn({ method: "POST" })
     const { getSmartLinkProvider } = await import("@/lib/smartlinks/adsterra.server");
     const stats = await getSmartLinkProvider(network.provider_key).getStats(data);
     const rows = stats.flatMap((stat) => {
+      if (!stat.placementSubId) return [];
       const link = links.find((item) =>
         item.network_placement_id === stat.placementId &&
-        (!stat.placementSubId || item.placement_sub_id === stat.placementSubId),
+        item.placement_sub_id === stat.placementSubId,
       );
       if (!link) return [];
       return [{
