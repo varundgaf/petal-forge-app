@@ -17,24 +17,31 @@ async function getItems(endpoint: string, query?: URLSearchParams): Promise<unkn
   });
   const body = (await response.json().catch(() => ({}))) as { items?: unknown[]; message?: string };
   if (!response.ok || !Array.isArray(body.items)) {
-    throw new Error(body.message || `Adsterra API error ${response.status}.`);
+    console.error("Adsterra request failed", { endpoint, status: response.status, message: body.message });
+    throw new Error("The SmartLink network is temporarily unavailable.");
   }
   return body.items;
 }
 
 const text = (value: unknown) => (value == null ? "" : String(value));
-const number = (value: unknown) => Number(value ?? 0) || 0;
+const number = (value: unknown) => {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+};
+const clippedText = (value: unknown, length: number) => text(value).slice(0, length);
 
 function placementFrom(item: unknown): NetworkPlacement | null {
   if (!item || typeof item !== "object") return null;
   const row = item as Record<string, unknown>;
-  const id = text(row.id ?? row.placement_id ?? row.placement);
+  const id = clippedText(row.id ?? row.placement_id ?? row.placement, 100);
   const url = text(row.url ?? row.link ?? row.smartlink_url ?? row.direct_url);
-  if (!id || !url.startsWith("https://")) return null;
+  let parsedUrl: URL;
+  try { parsedUrl = new URL(url); } catch { return null; }
+  if (!id || parsedUrl.protocol !== "https:") return null;
   return {
     id,
-    title: text(row.title ?? row.name ?? row.alias) || `SmartLink ${id}`,
-    url,
+    title: clippedText(row.title ?? row.name ?? row.alias, 120) || `SmartLink ${id}`,
+    url: parsedUrl.toString(),
   };
 }
 
@@ -42,15 +49,15 @@ function statFrom(item: unknown): NetworkStat | null {
   if (!item || typeof item !== "object") return null;
   const row = item as Record<string, unknown>;
   const date = text(row.date ?? row.stat_date).slice(0, 10);
-  const placementId = text(row.placement_id ?? row.placement);
-  if (!date || !placementId) return null;
+  const placementId = clippedText(row.placement_id ?? row.placement, 100);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !placementId || !Number.isFinite(Date.parse(`${date}T00:00:00Z`))) return null;
   return {
     date,
     placementId,
-    placementSubId: text(row.placement_sub_id ?? row.sub_id ?? row.psid),
-    country: text(row.country ?? row.geo),
-    device: text(row.device),
-    referrer: text(row.referrer),
+    placementSubId: clippedText(row.placement_sub_id ?? row.sub_id ?? row.psid, 100),
+    country: clippedText(row.country ?? row.geo, 100),
+    device: clippedText(row.device, 100),
+    referrer: clippedText(row.referrer, 500),
     impressions: number(row.impressions),
     clicks: number(row.clicks),
     revenue: number(row.revenue),

@@ -9,6 +9,14 @@ function classifyUserAgent(value: string) {
   return "desktop";
 }
 
+function getNetwork(value: unknown): { provider_key: string; is_active: boolean } | null {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  if (!candidate || typeof candidate !== "object") return null;
+  const row = candidate as Record<string, unknown>;
+  if (typeof row.provider_key !== "string" || typeof row.is_active !== "boolean") return null;
+  return { provider_key: row.provider_key, is_active: row.is_active };
+}
+
 export const Route = createFileRoute("/go/$slug")({
   server: {
     handlers: {
@@ -23,12 +31,13 @@ export const Route = createFileRoute("/go/$slug")({
           .maybeSingle();
         if (error || !link) return missing();
 
-        const network = link.networks as unknown as { provider_key: string; is_active: boolean };
-        if (!network.is_active) return missing();
+        const network = getNetwork(link.networks);
+        if (!network?.is_active) return missing();
 
         const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-        const ip = forwarded || request.headers.get("cf-connecting-ip") || "unknown";
-        const salt = process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(-24) || "adprofitly";
+        const ip = request.headers.get("cf-connecting-ip") || forwarded || "unknown";
+        const salt = process.env.SMARTLINK_FINGERPRINT_SECRET;
+        if (!salt) return new Response("Service unavailable.", { status: 503 });
         const fingerprint = createHash("sha256").update(`${salt}:${ip}`).digest("hex");
         const userAgent = request.headers.get("user-agent") || "";
         const userAgentClass = classifyUserAgent(userAgent);
@@ -60,6 +69,7 @@ export const Route = createFileRoute("/go/$slug")({
         });
 
         if (excessive) return new Response("Too many requests.", { status: 429, headers: { "Retry-After": "60" } });
+        if (userAgentClass === "bot" || !userAgent) return new Response("Automated traffic is not allowed.", { status: 403 });
         const { getSmartLinkProvider } = await import("@/lib/smartlinks/adsterra.server");
         const destination = getSmartLinkProvider(network.provider_key).buildRedirectUrl(link.destination_url, link.placement_sub_id);
         return new Response(null, {
