@@ -58,7 +58,7 @@ function statFrom(item: unknown): NetworkStat | null {
     country: clippedText(row.country ?? row.geo, 100),
     device: clippedText(row.device, 100),
     referrer: clippedText(row.referrer, 500),
-    impressions: number(row.impressions),
+    impressions: number(row.impressions ?? row.impression),
     clicks: number(row.clicks),
     revenue: number(row.revenue),
   };
@@ -74,7 +74,7 @@ export class AdsterraProvider implements SmartLinkProvider {
 
   async getStats({ from, to }: { from: string; to: string }) {
     const query = new URLSearchParams({ start_date: from, finish_date: to });
-    ["date", "placement", "placement_sub_id", "country"].forEach((dimension) =>
+    ["date", "placement", "placement_sub_id"].forEach((dimension) =>
       query.append("group_by[]", dimension),
     );
     const items = await getItems("/stats.json", query);
