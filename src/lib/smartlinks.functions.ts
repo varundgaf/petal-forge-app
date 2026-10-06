@@ -108,6 +108,17 @@ export const createSmartLink = createServerFn({ method: "POST" })
     const placement = placements.find((item) => item.id === data.placementId);
     if (!placement) throw new Error("This placement is not approved by the network.");
 
+    const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("id", context.userId).maybeSingle();
+    if (!profile) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(context.userId);
+      const email = authUser.user?.email ?? `${context.userId}@users.adprofitly.com`;
+      const { error: profileError } = await supabaseAdmin.from("profiles").insert({ id: context.userId, email, name: email.split("@")[0] });
+      if (profileError) {
+        console.error("SmartLink profile setup failed", profileError);
+        throw new Error("SmartLink could not be created.");
+      }
+    }
+
     const slug = randomBytes(9).toString("base64url").toLowerCase();
     const placementSubId = `ap_${context.userId.replaceAll("-", "").slice(0, 8)}_${randomBytes(6).toString("hex")}`;
     const { data: row, error } = await supabaseAdmin
