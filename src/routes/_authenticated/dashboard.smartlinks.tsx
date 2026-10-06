@@ -132,8 +132,12 @@ function SmartLinksPage() {
   const createMutation = useMutation({
     mutationFn: () => createFn({ data: form }),
     onSuccess: async (result) => {
-      await navigator.clipboard.writeText(result.branded_url);
-      toast.success("SmartLink created and copied.");
+      try {
+        await navigator.clipboard.writeText(result.branded_url);
+        toast.success("SmartLink created and copied.");
+      } catch {
+        toast.success(`SmartLink created: ${result.branded_url}`);
+      }
       setCreateOpen(false);
       setForm({ name: "", trafficSource: "", placementId: "" });
       refresh();
