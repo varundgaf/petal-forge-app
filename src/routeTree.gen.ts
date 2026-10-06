@@ -9,54 +9,90 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as FeaturesRouteImport } from './routes/features'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as VerifyEmailRouteImport } from './routes/verify-email'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
-import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as GoSlugRouteImport } from './routes/go.$slug'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
-import { Route as AuthenticatedDashboardAdUnitsRouteImport } from './routes/_authenticated/dashboard.ad-units'
-import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
-import { Route as AuthenticatedDashboardPaymentsRouteImport } from './routes/_authenticated/dashboard.payments'
-import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
-import { Route as AuthenticatedDashboardSitesRouteImport } from './routes/_authenticated/dashboard.sites'
-import { Route as AuthenticatedDashboardSmartlinksRouteImport } from './routes/_authenticated/dashboard.smartlinks'
-import { Route as AuthenticatedDashboardTrafficQualityRouteImport } from './routes/_authenticated/dashboard.traffic-quality'
-import { Route as AdminGatedAuditRouteImport } from './routes/admin/_gated/audit'
-import { Route as AdminGatedCmsRouteImport } from './routes/admin/_gated/cms'
-import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
-import { Route as AdminGatedNotificationsRouteImport } from './routes/admin/_gated/notifications'
-import { Route as AdminGatedPaymentsRouteImport } from './routes/admin/_gated/payments'
-import { Route as AdminGatedReportsRouteImport } from './routes/admin/_gated/reports'
-import { Route as AdminGatedSearchRouteImport } from './routes/admin/_gated/search'
-import { Route as AdminGatedSettingsRouteImport } from './routes/admin/_gated/settings'
-import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites'
-import { Route as AdminGatedSupportRouteImport } from './routes/admin/_gated/support'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
-import { Route as AdminGatedUsersUserIdRouteImport } from './routes/admin/_gated/users.$userId'
-import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as AdminGatedSupportRouteImport } from './routes/admin/_gated/support'
+import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites'
+import { Route as AdminGatedSettingsRouteImport } from './routes/admin/_gated/settings'
+import { Route as AdminGatedSearchRouteImport } from './routes/admin/_gated/search'
+import { Route as AdminGatedReportsRouteImport } from './routes/admin/_gated/reports'
+import { Route as AdminGatedPaymentsRouteImport } from './routes/admin/_gated/payments'
+import { Route as AdminGatedNotificationsRouteImport } from './routes/admin/_gated/notifications'
+import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
+import { Route as AdminGatedCmsRouteImport } from './routes/admin/_gated/cms'
+import { Route as AdminGatedAuditRouteImport } from './routes/admin/_gated/audit'
+import { Route as AuthenticatedDashboardTrafficQualityRouteImport } from './routes/_authenticated/dashboard.traffic-quality'
+import { Route as AuthenticatedDashboardSmartlinksRouteImport } from './routes/_authenticated/dashboard.smartlinks'
+import { Route as AuthenticatedDashboardSitesRouteImport } from './routes/_authenticated/dashboard.sites'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
+import { Route as AuthenticatedDashboardPaymentsRouteImport } from './routes/_authenticated/dashboard.payments'
+import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
+import { Route as AuthenticatedDashboardAdUnitsRouteImport } from './routes/_authenticated/dashboard.ad-units'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as AdminGatedUsersUserIdRouteImport } from './routes/admin/_gated/users.$userId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -69,68 +105,18 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeaturesRoute = FeaturesRouteImport.update({
-  id: '/features',
-  path: '/features',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VerifyEmailRoute = VerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminGatedRouteRoute = AdminGatedRouteRouteImport.update({
-  id: '/_gated',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const GoSlugRoute = GoSlugRouteImport.update({
@@ -138,40 +124,85 @@ const GoSlugRoute = GoSlugRouteImport.update({
   path: '/go/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AdminGatedRouteRoute = AdminGatedRouteRouteImport.update({
+  id: '/_gated',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardAdUnitsRoute =
-  AuthenticatedDashboardAdUnitsRouteImport.update({
-    id: '/ad-units',
-    path: '/ad-units',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardAnalyticsRoute =
-  AuthenticatedDashboardAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardPaymentsRoute =
-  AuthenticatedDashboardPaymentsRouteImport.update({
-    id: '/payments',
-    path: '/payments',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardSettingsRoute =
-  AuthenticatedDashboardSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardSitesRoute =
-  AuthenticatedDashboardSitesRouteImport.update({
-    id: '/sites',
-    path: '/sites',
+const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedSupportRoute = AdminGatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedSitesRoute = AdminGatedSitesRouteImport.update({
+  id: '/sites',
+  path: '/sites',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedSettingsRoute = AdminGatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedSearchRoute = AdminGatedSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedReportsRoute = AdminGatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedPaymentsRoute = AdminGatedPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedNotificationsRoute = AdminGatedNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedCmsRoute = AdminGatedCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedAuditRoute = AdminGatedAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AuthenticatedDashboardTrafficQualityRoute =
+  AuthenticatedDashboardTrafficQualityRouteImport.update({
+    id: '/traffic-quality',
+    path: '/traffic-quality',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardSmartlinksRoute =
@@ -180,81 +211,50 @@ const AuthenticatedDashboardSmartlinksRoute =
     path: '/smartlinks',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardTrafficQualityRoute =
-  AuthenticatedDashboardTrafficQualityRouteImport.update({
-    id: '/traffic-quality',
-    path: '/traffic-quality',
+const AuthenticatedDashboardSitesRoute =
+  AuthenticatedDashboardSitesRouteImport.update({
+    id: '/sites',
+    path: '/sites',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AdminGatedAuditRoute = AdminGatedAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedCmsRoute = AdminGatedCmsRouteImport.update({
-  id: '/cms',
-  path: '/cms',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedNotificationsRoute = AdminGatedNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedPaymentsRoute = AdminGatedPaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedReportsRoute = AdminGatedReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedSearchRoute = AdminGatedSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedSettingsRoute = AdminGatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedSitesRoute = AdminGatedSitesRouteImport.update({
-  id: '/sites',
-  path: '/sites',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedSupportRoute = AdminGatedSupportRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminGatedRouteRoute,
-} as any)
-const AdminGatedUsersUserIdRoute = AdminGatedUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => AdminGatedUsersRoute,
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardPaymentsRoute =
+  AuthenticatedDashboardPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardAnalyticsRoute =
+  AuthenticatedDashboardAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardAdUnitsRoute =
+  AuthenticatedDashboardAdUnitsRouteImport.update({
+    id: '/ad-units',
+    path: '/ad-units',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
+const AdminGatedUsersUserIdRoute = AdminGatedUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminGatedUsersRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -522,18 +522,67 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -550,95 +599,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/features': {
-      id: '/features'
-      path: '/features'
-      fullPath: '/features'
-      preLoaderRoute: typeof FeaturesRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/verify-email': {
-      id: '/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof VerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/_gated': {
-      id: '/admin/_gated'
-      path: ''
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminGatedRouteRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/go/$slug': {
@@ -648,6 +627,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/admin/_gated': {
+      id: '/admin/_gated'
+      path: ''
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminGatedRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/'
@@ -655,116 +655,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/ad-units': {
-      id: '/_authenticated/dashboard/ad-units'
-      path: '/ad-units'
-      fullPath: '/dashboard/ad-units'
-      preLoaderRoute: typeof AuthenticatedDashboardAdUnitsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/analytics': {
-      id: '/_authenticated/dashboard/analytics'
-      path: '/analytics'
-      fullPath: '/dashboard/analytics'
-      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/payments': {
-      id: '/_authenticated/dashboard/payments'
-      path: '/payments'
-      fullPath: '/dashboard/payments'
-      preLoaderRoute: typeof AuthenticatedDashboardPaymentsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/settings': {
-      id: '/_authenticated/dashboard/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/sites': {
-      id: '/_authenticated/dashboard/sites'
-      path: '/sites'
-      fullPath: '/dashboard/sites'
-      preLoaderRoute: typeof AuthenticatedDashboardSitesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/smartlinks': {
-      id: '/_authenticated/dashboard/smartlinks'
-      path: '/smartlinks'
-      fullPath: '/dashboard/smartlinks'
-      preLoaderRoute: typeof AuthenticatedDashboardSmartlinksRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/_authenticated/dashboard/traffic-quality': {
-      id: '/_authenticated/dashboard/traffic-quality'
-      path: '/traffic-quality'
-      fullPath: '/dashboard/traffic-quality'
-      preLoaderRoute: typeof AuthenticatedDashboardTrafficQualityRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
-    '/admin/_gated/audit': {
-      id: '/admin/_gated/audit'
-      path: '/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AdminGatedAuditRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/cms': {
-      id: '/admin/_gated/cms'
-      path: '/cms'
-      fullPath: '/admin/cms'
-      preLoaderRoute: typeof AdminGatedCmsRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/dashboard': {
-      id: '/admin/_gated/dashboard'
-      path: '/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminGatedDashboardRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/notifications': {
-      id: '/admin/_gated/notifications'
-      path: '/notifications'
-      fullPath: '/admin/notifications'
-      preLoaderRoute: typeof AdminGatedNotificationsRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/payments': {
-      id: '/admin/_gated/payments'
-      path: '/payments'
-      fullPath: '/admin/payments'
-      preLoaderRoute: typeof AdminGatedPaymentsRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/reports': {
-      id: '/admin/_gated/reports'
-      path: '/reports'
-      fullPath: '/admin/reports'
-      preLoaderRoute: typeof AdminGatedReportsRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/search': {
-      id: '/admin/_gated/search'
-      path: '/search'
-      fullPath: '/admin/search'
-      preLoaderRoute: typeof AdminGatedSearchRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/settings': {
-      id: '/admin/_gated/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminGatedSettingsRouteImport
-      parentRoute: typeof AdminGatedRouteRoute
-    }
-    '/admin/_gated/sites': {
-      id: '/admin/_gated/sites'
-      path: '/sites'
-      fullPath: '/admin/sites'
-      preLoaderRoute: typeof AdminGatedSitesRouteImport
+    '/admin/_gated/users': {
+      id: '/admin/_gated/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminGatedUsersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
     '/admin/_gated/support': {
@@ -774,19 +669,124 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedSupportRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
-    '/admin/_gated/users': {
-      id: '/admin/_gated/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminGatedUsersRouteImport
+    '/admin/_gated/sites': {
+      id: '/admin/_gated/sites'
+      path: '/sites'
+      fullPath: '/admin/sites'
+      preLoaderRoute: typeof AdminGatedSitesRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
-    '/admin/_gated/users/$userId': {
-      id: '/admin/_gated/users/$userId'
-      path: '/$userId'
-      fullPath: '/admin/users/$userId'
-      preLoaderRoute: typeof AdminGatedUsersUserIdRouteImport
-      parentRoute: typeof AdminGatedUsersRoute
+    '/admin/_gated/settings': {
+      id: '/admin/_gated/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminGatedSettingsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/search': {
+      id: '/admin/_gated/search'
+      path: '/search'
+      fullPath: '/admin/search'
+      preLoaderRoute: typeof AdminGatedSearchRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/reports': {
+      id: '/admin/_gated/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminGatedReportsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/payments': {
+      id: '/admin/_gated/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminGatedPaymentsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/notifications': {
+      id: '/admin/_gated/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminGatedNotificationsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/dashboard': {
+      id: '/admin/_gated/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminGatedDashboardRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/cms': {
+      id: '/admin/_gated/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AdminGatedCmsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/audit': {
+      id: '/admin/_gated/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminGatedAuditRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/_authenticated/dashboard/traffic-quality': {
+      id: '/_authenticated/dashboard/traffic-quality'
+      path: '/traffic-quality'
+      fullPath: '/dashboard/traffic-quality'
+      preLoaderRoute: typeof AuthenticatedDashboardTrafficQualityRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/smartlinks': {
+      id: '/_authenticated/dashboard/smartlinks'
+      path: '/smartlinks'
+      fullPath: '/dashboard/smartlinks'
+      preLoaderRoute: typeof AuthenticatedDashboardSmartlinksRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/sites': {
+      id: '/_authenticated/dashboard/sites'
+      path: '/sites'
+      fullPath: '/dashboard/sites'
+      preLoaderRoute: typeof AuthenticatedDashboardSitesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/payments': {
+      id: '/_authenticated/dashboard/payments'
+      path: '/payments'
+      fullPath: '/dashboard/payments'
+      preLoaderRoute: typeof AuthenticatedDashboardPaymentsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/analytics': {
+      id: '/_authenticated/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/ad-units': {
+      id: '/_authenticated/dashboard/ad-units'
+      path: '/ad-units'
+      fullPath: '/dashboard/ad-units'
+      preLoaderRoute: typeof AuthenticatedDashboardAdUnitsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
@@ -795,12 +795,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/_gated/users/$userId': {
+      id: '/admin/_gated/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminGatedUsersUserIdRouteImport
+      parentRoute: typeof AdminGatedUsersRoute
     }
   }
 }
