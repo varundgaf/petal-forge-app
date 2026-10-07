@@ -45,11 +45,11 @@ function placementFrom(item: unknown): NetworkPlacement | null {
   };
 }
 
-function statFrom(item: unknown): NetworkStat | null {
+function statFrom(item: unknown, placementOverride?: string): NetworkStat | null {
   if (!item || typeof item !== "object") return null;
   const row = item as Record<string, unknown>;
   const date = text(row.date ?? row.stat_date).slice(0, 10);
-  const placementId = clippedText(row.placement_id ?? row.placement, 100);
+  const placementId = clippedText(row.placement_id ?? row.placement ?? placementOverride, 100);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !placementId || !Number.isFinite(Date.parse(`${date}T00:00:00Z`))) return null;
   return {
     date,
@@ -78,7 +78,22 @@ export class AdsterraProvider implements SmartLinkProvider {
       query.append("group_by[]", dimension),
     );
     const items = await getItems("/stats.json", query);
-    return items.map(statFrom).filter((item): item is NetworkStat => Boolean(item));
+    const totals = items.map((item) => statFrom(item)).filter((item): item is NetworkStat => Boolean(item));
+    // Adsterra allows three groupings, not four. PSIDs are globally unique
+    // in AdProfitly; resolve placement from the authoritative daily report.
+    const geoQuery = new URLSearchParams({ start_date: from, finish_date: to });
+    ["date", "placement_sub_id", "country"].forEach((dimension) => geoQuery.append("group_by[]", dimension));
+    const geoItems = await getItems("/stats.json", geoQuery);
+    return totals.flatMap((total) => {
+      if (!total.placementSubId) return [total];
+      const breakdown = geoItems.map((item) => statFrom(item, total.placementId)).filter((item): item is NetworkStat =>
+        Boolean(item && item.date === total.date && item.placementSubId === total.placementSubId),
+      );
+      const summed = breakdown.reduce((sum, row) => ({ impressions: sum.impressions + row.impressions, clicks: sum.clicks + row.clicks, revenue: sum.revenue + row.revenue }), { impressions: 0, clicks: 0, revenue: 0 });
+      // Never mix totals with a breakdown, or accept a partial/mismatched report.
+      return breakdown.length && summed.impressions === total.impressions && summed.clicks === total.clicks && Math.abs(summed.revenue - total.revenue) <= 0.00001
+        ? breakdown : [total];
+    });
   }
 
   buildRedirectUrl(destinationUrl: string, placementSubId: string) {
