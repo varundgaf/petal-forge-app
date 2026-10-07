@@ -27,6 +27,7 @@ import {
   createSmartLink,
   deleteSmartLink,
   getSmartLinkAnalytics,
+  getSmartLinkTraffic,
   listNetworkPlacements,
   listSmartLinks,
   setSmartLinkStatus,
@@ -107,6 +108,7 @@ function SmartLinksPage() {
   const deleteFn = useServerFn(deleteSmartLink);
   const analyticsFn = useServerFn(getSmartLinkAnalytics);
   const syncFn = useServerFn(syncSmartLinkStats);
+  const trafficFn = useServerFn(getSmartLinkTraffic);
   const [createOpen, setCreateOpen] = useState(false);
   const [analyticsId, setAnalyticsId] = useState<string>();
   const [deleteId, setDeleteId] = useState<string>();
@@ -127,6 +129,34 @@ function SmartLinksPage() {
     queryFn: () => analyticsFn({ data: { smartLinkId: analyticsId, ...range } }),
     enabled: Boolean(analyticsId),
   });
+
+  const trafficQuery = useQuery({
+    queryKey: ["smartlink-traffic", analyticsId, range.from, range.to],
+    queryFn: () => analyticsId ? trafficFn({ data: { id: analyticsId, ...range } }) : Promise.resolve([]),
+    enabled: Boolean(analyticsId),
+  });
+  const automaticSync = useQuery({
+    queryKey: ["smartlink-auto-sync", range.from, range.to],
+    queryFn: async () => {
+      const result = await syncFn({ data: range });
+      await Promise.all([queryClient.invalidateQueries({ queryKey: ["smartlinks"] }), queryClient.invalidateQueries({ queryKey: ["smartlink-analytics"] })]);
+      return result;
+    },
+    enabled: Boolean(linksQuery.data?.length),
+    staleTime: 900000,
+    refetchInterval: 900000,
+    refetchIntervalInBackground: false,
+    retry: false,
+  });
+  const visits = useMemo(() => {
+    const devices = new Map<string, number>(), referrers = new Map<string, number>();
+    for (const row of trafficQuery.data ?? []) {
+      addDimension(devices, row.device ?? "Unknown", 1);
+      addDimension(referrers, row.referrer_host ?? "Direct", 1);
+    }
+    const sorted = (map: Map<string, number>) => Array.from(map, ([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value).slice(0, 5);
+    return { devices: sorted(devices), referrers: sorted(referrers) };
+  }, [trafficQuery.data]);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["smartlinks"] });
   const createMutation = useMutation({
@@ -195,6 +225,7 @@ function SmartLinksPage() {
         </Dialog>
       </div>
 
+      {(linksQuery.isError || automaticSync.isError) && <p role="alert" className="text-sm text-destructive">{linksQuery.error?.message ?? automaticSync.error?.message}</p>}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px] text-sm">
@@ -220,9 +251,10 @@ function SmartLinksPage() {
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2">{PRESETS.map((item) => <Button key={item} type="button" size="sm" variant={preset === item ? "default" : "outline"} onClick={() => setPreset(item)}>{item}</Button>)}<Button type="button" size="sm" variant="ghost" onClick={() => syncMutation.mutate()} disabled={syncMutation.isPending}>{syncMutation.isPending ? "Syncing…" : "Sync now"}</Button></div>
             {preset === "Custom Range" && <div className="grid max-w-md gap-3 sm:grid-cols-2"><div className="space-y-1"><Label htmlFor="smart-from">From</Label><Input id="smart-from" type="date" value={custom.from} onChange={(event) => setCustom({ ...custom, from: event.target.value })} /></div><div className="space-y-1"><Label htmlFor="smart-to">To</Label><Input id="smart-to" type="date" value={custom.to} onChange={(event) => setCustom({ ...custom, to: event.target.value })} /></div></div>}
+            {analyticsQuery.isError && <p role="alert" className="text-sm text-destructive">{analyticsQuery.error.message}</p>}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{[{ label: "Revenue", value: `$${analytics.revenue.toFixed(2)}` }, { label: "Clicks", value: analytics.clicks.toLocaleString() }, { label: "Impressions", value: analytics.impressions.toLocaleString() }, { label: "CTR", value: `${analytics.ctr.toFixed(2)}%` }, { label: "CPM", value: `$${analytics.cpm.toFixed(2)}` }].map((metric) => <div key={metric.label} className="rounded-xl border border-border bg-card p-4"><p className="text-[11px] uppercase tracking-wider text-muted-foreground">{metric.label}</p><p className={cn("mt-2 font-display text-xl font-semibold", metric.label === "Revenue" && "text-primary")}>{analyticsQuery.isLoading ? "…" : metric.value}</p></div>)}</div>
             <div className="rounded-xl border border-border bg-card p-5"><h3 className="mb-4 font-display font-semibold">Daily revenue</h3><div className="h-64"><ResponsiveContainer width="100%" height="100%"><LineChart data={analytics.daily}><CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.4} /><XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} tickFormatter={(date) => format(new Date(date), "MMM d")} /><YAxis stroke="var(--muted-foreground)" fontSize={12} /><Tooltip formatter={(value: number) => `$${Number(value).toFixed(2)}`} contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} /><Line type="monotone" dataKey="revenue" stroke="var(--chart-1)" strokeWidth={2} dot={false} /></LineChart></ResponsiveContainer></div></div>
-            <div className="grid gap-6 md:grid-cols-3"><DimensionList title="Top countries" rows={analytics.countries} /><DimensionList title="Top devices" rows={analytics.devices} /><DimensionList title="Top referrers" rows={analytics.referrers} /></div>
+            <div className="grid gap-6 md:grid-cols-3"><DimensionList title="Top countries" rows={analytics.countries} /><DimensionList title="Top devices · visits" rows={visits.devices} count /><DimensionList title="Top referrers · visits" rows={visits.referrers} count /></div>
           </div>
         </DialogContent>
       </Dialog>
@@ -250,6 +282,6 @@ function summarize(rows: AnalyticsRow[]) {
 
 function addDimension(map: Map<string, number>, label: string, value: number) { const key = label || "Unknown"; map.set(key, (map.get(key) ?? 0) + value); }
 
-function DimensionList({ title, rows }: { title: string; rows: { label: string; value: number }[] }) {
-  return <div className="rounded-xl border border-border bg-card p-5"><h3 className="mb-3 font-display font-semibold">{title}</h3><ul className="space-y-2">{rows.length ? rows.map((row) => <li key={row.label} className="flex items-center justify-between gap-3 text-sm"><span className="truncate">{row.label}</span><span className="font-mono text-primary">${row.value.toFixed(2)}</span></li>) : <li className="text-sm text-muted-foreground">No data.</li>}</ul></div>;
+function DimensionList({ title, rows, count = false }: { title: string; rows: { label: string; value: number }[]; count?: boolean }) {
+  return <div className="rounded-xl border border-border bg-card p-5"><h3 className="mb-3 font-display font-semibold">{title}</h3><ul className="space-y-2">{rows.length ? rows.map((row) => <li key={row.label} className="flex items-center justify-between gap-3 text-sm"><span className="truncate">{row.label}</span><span className="font-mono text-primary">{count ? row.value.toLocaleString() : `$${row.value.toFixed(2)}`}</span></li>) : <li className="text-sm text-muted-foreground">No data.</li>}</ul></div>;
 }

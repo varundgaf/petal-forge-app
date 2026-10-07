@@ -909,6 +909,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      replace_smartlink_report: {
+        Args: {
+          _from: string
+          _network_id: string
+          _rows: Json
+          _to: string
+          _user_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       ad_format:
