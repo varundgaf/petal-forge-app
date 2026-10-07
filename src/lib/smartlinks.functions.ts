@@ -58,6 +58,9 @@ export const listSmartLinks = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
+    const { data: profile, error: profileError } = await supabaseAdmin.from("profiles").select("revenue_share").eq("id", context.userId).single();
+    if (profileError || !profile) throw new Error("Publisher earnings could not be loaded.");
+    const share = Number(profile.revenue_share) / 100;
     const ids = (links ?? []).map((link) => link.id);
     const stats = ids.length
       ? await supabaseAdmin.from("network_stats").select("smart_link_id,clicks,revenue,impressions").eq("user_id", context.userId).in("smart_link_id", ids)
@@ -68,7 +71,7 @@ export const listSmartLinks = createServerFn({ method: "GET" })
     for (const row of stats.data ?? []) {
       const current = totals.get(row.smart_link_id) ?? { clicks: 0, revenue: 0, impressions: 0 };
       current.clicks += Number(row.clicks);
-      current.revenue += Number(row.revenue);
+      current.revenue += Number(row.revenue) * share;
       current.impressions += Number(row.impressions);
       totals.set(row.smart_link_id, current);
     }
@@ -189,53 +192,28 @@ export const getSmartLinkAnalytics = createServerFn({ method: "POST" })
     if (data.smartLinkId) query = query.eq("smart_link_id", data.smartLinkId);
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const { data: profile, error: profileError } = await supabaseAdmin.from("profiles").select("revenue_share").eq("id", context.userId).single();
+    if (profileError || !profile) throw new Error("Publisher earnings could not be loaded.");
+    return (rows ?? []).map((row) => ({ ...row, revenue: Number(row.revenue) * Number(profile.revenue_share) / 100 }));
   });
 
 export const syncSmartLinkStats = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(rangeInput)
   .handler(async ({ context, data }) => {
+    const { syncReports } = await import("@/lib/smartlinks/sync.server");
+    return syncReports(data, context.userId);
+  });
+
+export const getSmartLinkTraffic = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: DateRange & { id: string }) => ({ ...rangeInput(data), ...idInput(data) }))
+  .handler(async ({ context, data }) => {
     const supabaseAdmin = await admin();
-    const network = await activeNetwork();
-
-    const { data: links, error: linksError } = await supabaseAdmin
-      .from("smart_links")
-      .select("id,user_id,network_placement_id,placement_sub_id")
-      .eq("user_id", context.userId)
-      .eq("network_id", network.id);
-    if (linksError) throw new Error(linksError.message);
-    if (!links?.length) return { rows: 0 };
-
-    const { getSmartLinkProvider } = await import("@/lib/smartlinks/adsterra.server");
-    const stats = await getSmartLinkProvider(network.provider_key).getStats(data);
-    const rows = stats.flatMap((stat) => {
-      if (!stat.placementSubId) return [];
-      const link = links.find((item) =>
-        item.network_placement_id === stat.placementId &&
-        item.placement_sub_id === stat.placementSubId,
-      );
-      if (!link) return [];
-      return [{
-        user_id: link.user_id,
-        smart_link_id: link.id,
-        network_id: network.id,
-        stat_date: stat.date,
-        country: stat.country,
-        device: stat.device,
-        referrer: stat.referrer,
-        impressions: stat.impressions,
-        clicks: stat.clicks,
-        revenue: stat.revenue,
-        ctr: stat.impressions ? (stat.clicks / stat.impressions) * 100 : 0,
-        cpm: stat.impressions ? (stat.revenue / stat.impressions) * 1000 : 0,
-      }];
-    });
-    if (rows.length) {
-      const { error } = await supabaseAdmin.from("network_stats").upsert(rows, {
-        onConflict: "smart_link_id,stat_date,country,device,referrer",
-      });
-      if (error) throw new Error(error.message);
-    }
-    return { rows: rows.length };
+    const { data: rows, error } = await supabaseAdmin.from("traffic_events")
+      .select("device,referrer_host").eq("user_id", context.userId).eq("smart_link_id", data.id)
+      .eq("is_suspicious", false).gte("occurred_at", `${data.from}T00:00:00Z`)
+      .lt("occurred_at", new Date(Date.parse(`${data.to}T00:00:00Z`) + 86400000).toISOString()).limit(10000);
+    if (error) throw new Error("Traffic details could not be loaded.");
+    return rows ?? [];
   });
