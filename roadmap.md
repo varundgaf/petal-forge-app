@@ -1,6 +1,6 @@
 # Remaining SmartLinks work
 
-- [ ] Confirm backend connection health for the publisher.
+- [x] Confirm backend connection health for the publisher.
 
 - [ ] Complete supported Adsterra country reporting without double-counting or cross-publisher attribution.
 - [ ] Persist publisher earnings and sync status; refresh automatically while SmartLinks is open.
