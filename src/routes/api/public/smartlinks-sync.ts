@@ -12,8 +12,10 @@ export const Route = createFileRoute("/api/public/smartlinks-sync")({
         const { data } = await supabaseAdmin.from("cron_tokens" as never).select("token").eq("name", "smartlinks_sync").maybeSingle();
         const expected = (data as { token?: string } | null)?.token;
         if (!expected || expected !== token) return new Response("Unauthorized", { status: 401 });
+        const body = (await request.json().catch(() => ({}))) as { days?: number };
+        const days = Math.min(Math.max(Math.floor(Number(body.days) || 30), 1), 365);
         const to = new Date();
-        const from = new Date(to.getTime() - 30 * 86_400_000);
+        const from = new Date(to.getTime() - days * 86_400_000);
         const iso = (d: Date) => d.toISOString().slice(0, 10);
         const { syncReports } = await import("@/lib/smartlinks/sync.server");
         try {
