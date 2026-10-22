@@ -46,6 +46,7 @@ import { Route as AdminGatedSettingsRouteImport } from './routes/admin/_gated/se
 import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites'
 import { Route as AdminGatedSupportRouteImport } from './routes/admin/_gated/support'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
+import { Route as ApiPublicSmartlinksSyncRouteImport } from './routes/api/public/smartlinks-sync'
 import { Route as AdminGatedUsersUserIdRouteImport } from './routes/admin/_gated/users.$userId'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -241,6 +242,11 @@ const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const ApiPublicSmartlinksSyncRoute = ApiPublicSmartlinksSyncRouteImport.update({
+  id: '/api/public/smartlinks-sync',
+  path: '/api/public/smartlinks-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminGatedUsersUserIdRoute = AdminGatedUsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/admin/sites': typeof AdminGatedSitesRoute
   '/admin/support': typeof AdminGatedSupportRoute
   '/admin/users': typeof AdminGatedUsersRouteWithChildren
+  '/api/public/smartlinks-sync': typeof ApiPublicSmartlinksSyncRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/admin/sites': typeof AdminGatedSitesRoute
   '/admin/support': typeof AdminGatedSupportRoute
   '/admin/users': typeof AdminGatedUsersRouteWithChildren
+  '/api/public/smartlinks-sync': typeof ApiPublicSmartlinksSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/admin/_gated/sites': typeof AdminGatedSitesRoute
   '/admin/_gated/support': typeof AdminGatedSupportRoute
   '/admin/_gated/users': typeof AdminGatedUsersRouteWithChildren
+  '/api/public/smartlinks-sync': typeof ApiPublicSmartlinksSyncRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/admin/_gated/users/$userId': typeof AdminGatedUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -415,6 +424,7 @@ export interface FileRouteTypes {
     | '/admin/sites'
     | '/admin/support'
     | '/admin/users'
+    | '/api/public/smartlinks-sync'
     | '/dashboard/'
     | '/admin/users/$userId'
     | '/lovable/email/auth/preview'
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/admin/sites'
     | '/admin/support'
     | '/admin/users'
+    | '/api/public/smartlinks-sync'
     | '/dashboard'
     | '/admin/users/$userId'
     | '/lovable/email/auth/preview'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/_gated/sites'
     | '/admin/_gated/support'
     | '/admin/_gated/users'
+    | '/api/public/smartlinks-sync'
     | '/_authenticated/dashboard/'
     | '/admin/_gated/users/$userId'
     | '/lovable/email/auth/preview'
@@ -516,6 +528,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   GoSlugRoute: typeof GoSlugRoute
+  ApiPublicSmartlinksSyncRoute: typeof ApiPublicSmartlinksSyncRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
 }
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedUsersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/api/public/smartlinks-sync': {
+      id: '/api/public/smartlinks-sync'
+      path: '/api/public/smartlinks-sync'
+      fullPath: '/api/public/smartlinks-sync'
+      preLoaderRoute: typeof ApiPublicSmartlinksSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/_gated/users/$userId': {
       id: '/admin/_gated/users/$userId'
       path: '/$userId'
@@ -921,6 +941,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   GoSlugRoute: GoSlugRoute,
+  ApiPublicSmartlinksSyncRoute: ApiPublicSmartlinksSyncRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
 }
