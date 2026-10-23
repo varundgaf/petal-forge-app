@@ -11,3 +11,4 @@
 
 - Keep SmartLinks provider reporting in server-only modules and persist report replacement plus publisher earnings in one service-role-only database transaction; this prevents partial reports and double-counting across syncs.
 - Match network reports by both placement and globally unique sub-ID; never allocate shared placement revenue or estimate country earnings from observed visits.
+- network_stats.source separates provider rows ('api') from admin-entered rows ('manual'); provider sync replaces only 'api' rows so admin reports are never wiped.
