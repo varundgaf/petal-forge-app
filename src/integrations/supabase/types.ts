@@ -215,6 +215,7 @@ export type Database = {
           referrer: string
           revenue: number
           smart_link_id: string
+          source: string
           stat_date: string
           updated_at: string
           user_id: string
@@ -232,6 +233,7 @@ export type Database = {
           referrer?: string
           revenue?: number
           smart_link_id: string
+          source?: string
           stat_date: string
           updated_at?: string
           user_id: string
@@ -249,6 +251,7 @@ export type Database = {
           referrer?: string
           revenue?: number
           smart_link_id?: string
+          source?: string
           stat_date?: string
           updated_at?: string
           user_id?: string
