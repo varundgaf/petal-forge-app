@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
+import { PaymentPolicyAnnouncement } from "./PaymentPolicy";
 
 const links = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -41,6 +42,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <PaymentPolicyAnnouncement />
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-border/60 bg-card/40 backdrop-blur-xl md:flex">
         <Link to="/" className="flex h-16 items-center gap-2 border-b border-border/60 px-6">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-money shadow-glow">

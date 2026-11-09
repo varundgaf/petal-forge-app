@@ -14,6 +14,7 @@ import {
 import { format, subDays } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { VerifiedQuality } from "@/components/dashboard/VerifiedQuality";
 
 export const Route = createFileRoute("/_authenticated/dashboard/traffic-quality")({
   component: TrafficQualityPage,
@@ -486,6 +487,8 @@ function TrafficQualityPage() {
           Anomaly signals derived from your recorded analytics. Detection feeds can be connected later.
         </p>
       </div>
+
+      <VerifiedQuality />
 
       {/* Score */}
       <div className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center">
