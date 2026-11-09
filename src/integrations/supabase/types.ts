@@ -1324,6 +1324,31 @@ export type Database = {
         }
         Returns: boolean
       }
+      payment_balances: { Args: { u: string }; Returns: Json }
+      payment_ingest: { Args: never; Returns: undefined }
+      payment_notify: {
+        Args: { b: string; t: string; u: string }
+        Returns: undefined
+      }
+      payment_policy_current: {
+        Args: never
+        Returns: {
+          effective_at: string
+          hour_utc: number
+          id: boolean
+          minimum: number
+          verification_days: number
+          version: number
+          weekday: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "publisher_payment_policy"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payment_tick: { Args: never; Returns: undefined }
       replace_smartlink_report: {
         Args: {
           _from: string
