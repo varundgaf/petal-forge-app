@@ -1,5 +1,10 @@
 # Remaining SmartLinks work
 
+## Payment system update
+- [ ] Add protected financial ledger, verification batches, exact adjustments, appeals and payout lifecycle.
+- [ ] Connect publisher payments, traffic quality, admin controls and versioned policy acknowledgement.
+- [ ] Verify financial rules, permissions, authenticated flows and mobile layout.
+
 - [x] Confirm backend connection health for the publisher.
 
 - [ ] Complete supported Adsterra country reporting without double-counting or cross-publisher attribution.
