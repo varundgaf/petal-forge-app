@@ -33,7 +33,7 @@ export function PaymentPolicyAnnouncement() {
   const { data } = useQuery({ queryKey: ['payment-policy', userId], queryFn: () => fetch({ data: {} }), enabled: role === 'publisher' && Boolean(userId) });
   const accept = useMutation({ mutationFn: () => operate({ data: { operation: 'accept_policy', payload: { version: data?.policy.version, accepted: agreed } } }), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['payment-policy'] }); queryClient.invalidateQueries({ queryKey: ['finance'] }); }, onError: (error: Error) => toast.error(error.message) });
   if (!data || role !== 'publisher' || data.accepted) return null;
-  return <Dialog open><DialogContent showCloseButton={false} onEscapeKeyDown={e => e.preventDefault()} onInteractOutside={e => e.preventDefault()} className="max-h-[96dvh] w-[96vw] max-w-4xl overflow-y-auto p-5 sm:p-8">
+  return <Dialog open><DialogContent onEscapeKeyDown={e => e.preventDefault()} onInteractOutside={e => e.preventDefault()} className="[&>button:last-child]:hidden max-h-[96dvh] w-[96vw] max-w-4xl overflow-y-auto p-5 sm:p-8">
     <DialogHeader><ShieldCheck className="mb-2 h-8 w-8 text-primary" /><DialogTitle className="text-xl leading-snug sm:text-2xl">IMPORTANT: UPDATED PAYMENT &amp; TRAFFIC QUALITY POLICY</DialogTitle><p className="pt-2 text-xs text-muted-foreground">Version {data.policy.version} · Effective {new Date(data.policy.effective_at).toLocaleDateString()}</p></DialogHeader>
     <PolicyContent policy={data.policy} />
     <Link to="/payment-policy" target="_blank" className="text-sm text-primary underline">Complete payment &amp; traffic quality policy</Link>
