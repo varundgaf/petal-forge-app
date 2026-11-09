@@ -1,9 +1,9 @@
 # Remaining SmartLinks work
 
 ## Payment system update
-- [ ] Add protected financial ledger, verification batches, exact adjustments, appeals and payout lifecycle.
-- [ ] Connect publisher payments, traffic quality, admin controls and versioned policy acknowledgement.
-- [ ] Verify financial rules, permissions, authenticated flows and mobile layout.
+- [x] Add protected financial ledger, verification batches, exact adjustments, appeals and payout lifecycle.
+- [x] Connect publisher payments, traffic quality, admin controls and versioned policy acknowledgement.
+- [x] Verify financial rules, permissions, authenticated flows and mobile layout.
 
 - [x] Confirm backend connection health for the publisher.
 
