@@ -1334,6 +1334,10 @@ export type Database = {
         Args: { actor: string; d: Json; operation: string }
         Returns: Json
       }
+      payment_operate_core: {
+        Args: { actor: string; d: Json; operation: string }
+        Returns: Json
+      }
       payment_policy_current: {
         Args: never
         Returns: {
@@ -1352,6 +1356,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      payment_regression_tests: { Args: never; Returns: Json }
       payment_snapshot: {
         Args: { all_publishers?: boolean; u: string }
         Returns: Json

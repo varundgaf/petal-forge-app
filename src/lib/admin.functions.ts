@@ -378,28 +378,13 @@ export const createPayment = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const reference_id =
-      data.reference_id?.trim() ||
-      `AP-PAY-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(Math.random() * 9000 + 1000)}`;
-    const { data: row, error } = await supabaseAdmin
-      .from("payments")
-      .insert({
-        user_id: data.user_id,
-        amount: data.amount,
-        method: data.method,
-        status: data.status,
-        destination: data.destination || null,
-        reference_id,
-        tx_hash: data.tx_hash || null,
-        notes: data.notes || null,
-        requested_at: data.requested_at ? new Date(data.requested_at).toISOString() : new Date().toISOString(),
-        paid_at: data.status === "paid" ? new Date(data.requested_at ?? Date.now()).toISOString() : null,
-      })
-      .select("id")
-      .single();
+    if (data.status !== "pending") throw new Error("Create an eligible payout before processing or confirming payment");
+    const { data: row, error } = await supabaseAdmin.rpc("payment_operate", {
+      actor: context.userId, operation: "admin_request_payout",
+      d: { user_id: data.user_id, amount: String(data.amount), key: data.reference_id || crypto.randomUUID(), reason: data.notes || "Admin requested eligible weekly payout" },
+    });
     if (error) throw new Error(error.message);
-    await logAction(context.userId, "payment.create", "payment", row?.id ?? null, { ...data, reference_id });
-    return { ok: true, id: row?.id };
+    return row;
   });
 
 export const deletePayment = createServerFn({ method: "POST" })
@@ -407,11 +392,7 @@ export const deletePayment = createServerFn({ method: "POST" })
   .inputValidator((d: { paymentId: string }) => d)
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("payments").delete().eq("id", data.paymentId);
-    if (error) throw new Error(error.message);
-    await logAction(context.userId, "payment.delete", "payment", data.paymentId, {});
-    return { ok: true };
+    throw new Error("Financial history cannot be deleted. Reject or reconcile the payment with a documented reason.");
   });
 
 
@@ -426,16 +407,14 @@ export const updatePayment = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: any = {};
-    if (data.status) {
-      patch.status = data.status;
-      if (data.status === "paid") patch.paid_at = new Date().toISOString();
-    }
-    if (data.tx_hash !== undefined) patch.tx_hash = data.tx_hash;
-    if (data.notes !== undefined) patch.notes = data.notes;
-    const { error } = await supabaseAdmin.from("payments").update(patch).eq("id", data.paymentId);
+    if (data.status === "paid") throw new Error("Confirm the actual transfer in Payment Management before marking paid");
+    const operations = { approved: "payment_approve", processing: "payment_release", failed: "payment_failed", rejected: "payment_reject" };
+    if (!data.status || !(data.status in operations)) throw new Error("Use audited payment lifecycle controls");
+    const { error } = await supabaseAdmin.rpc("payment_operate", {
+      actor: context.userId, operation: operations[data.status as keyof typeof operations],
+      d: { payment_id: data.paymentId, reason: data.notes || "", key: crypto.randomUUID() },
+    });
     if (error) throw new Error(error.message);
-    await logAction(context.userId, "payment.update", "payment", data.paymentId, patch);
     return { ok: true };
   });
 

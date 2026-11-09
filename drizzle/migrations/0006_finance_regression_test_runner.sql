@@ -1,0 +1,51 @@
+CREATE OR REPLACE FUNCTION public.payment_regression_tests() RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
+DECLARE u uuid; other uuid; b uuid; a uuid; pay uuid; admin_user uuid; original_policy public.publisher_payment_policy; checks text[]:=ARRAY[]::text[]; result jsonb; failed boolean; begin_at timestamptz;
+BEGIN
+BEGIN
+SELECT * INTO original_policy FROM public.publisher_payment_policy WHERE id;
+SELECT id INTO u FROM public.profiles ORDER BY created_at LIMIT 1;
+SELECT id INTO other FROM public.profiles WHERE id<>u ORDER BY created_at LIMIT 1;
+IF u IS NULL OR other IS NULL THEN RAISE EXCEPTION 'Two existing profiles needed for rollback-only test'; END IF;
+admin_user:=u;
+INSERT INTO public.user_roles(user_id,role) VALUES(u,'admin') ON CONFLICT DO NOTHING;
+UPDATE public.publisher_payment_policy SET minimum=50,verification_days=14,weekday=extract(dow FROM now() AT TIME ZONE 'UTC')::integer,hour_utc=0 WHERE id;
+UPDATE public.profiles SET kyc_status='verified',status='active' WHERE id=u;
+INSERT INTO public.publisher_payment_accounts(user_id,method,destination,verified,on_hold) VALUES(u,'wire','ROLLBACK_ONLY_TEST',true,false) ON CONFLICT(user_id) DO UPDATE SET verified=true,on_hold=false;
+INSERT INTO public.publisher_policy_acceptances(user_id,version) VALUES(u,original_policy.version) ON CONFLICT DO NOTHING;
+-- Isolate existing records inside the rollback-only subtransaction.
+UPDATE public.payments SET lifecycle_status='rejected',status='rejected' WHERE user_id=u AND status IN ('pending','approved','processing','failed');
+UPDATE public.publisher_earnings_batches SET investigation_open=false,reconciliation_open=false WHERE user_id=u;
+begin_at:=now()-interval '15 days';
+INSERT INTO public.publisher_earnings_batches(user_id,source,period_start,period_end,gross,verification_started_at,verification_ends_at,approved) VALUES(u,'test',current_date-1000,current_date-1000,500,begin_at,begin_at+interval '14 days',true) RETURNING id INTO b;
+PERFORM public.payment_operate(u,'adjustment',jsonb_build_object('batch_id',b,'amount','50','reason','Test verified attribution','evidence','Exact verified event-level revenue','evidence_key',gen_random_uuid()));
+IF (SELECT net FROM public.publisher_earnings_batches WHERE id=b)<>450 THEN RAISE EXCEPTION 'Expected 500-50=450'; END IF; checks:=array_append(checks,'verified adjustment 500 - 50 = 450');
+SELECT id INTO a FROM public.publisher_earnings_adjustments WHERE batch_id=b;
+failed:=false; BEGIN PERFORM public.payment_operate(u,'adjustment',jsonb_build_object('batch_id',b,'amount','500','reason','test','evidence','test','evidence_key',gen_random_uuid())); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION 'Negative balance adjustment accepted'; END IF; checks:=array_append(checks,'negative balance prevented');
+failed:=false; BEGIN PERFORM public.payment_operate(u,'adjustment',jsonb_build_object('batch_id',b,'amount','50','reason','test','evidence','test','evidence_key',(SELECT evidence_key FROM public.publisher_earnings_adjustments WHERE id=a))); EXCEPTION WHEN unique_violation THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION 'Duplicate evidence accepted'; END IF; checks:=array_append(checks,'duplicate adjustment prevented');
+failed:=false; BEGIN INSERT INTO public.publisher_earnings_batches(user_id,source,period_start,period_end,gross,verification_ends_at) VALUES(u,'test_short',current_date,current_date,10,now()+interval '13 days'); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION '13 day hold accepted'; END IF; checks:=array_append(checks,'14-day backend hold enforced');
+UPDATE public.publisher_earnings_batches SET approved=true,investigation_open=true WHERE id=b;
+PERFORM public.payment_tick(); IF (SELECT finalized_at FROM public.publisher_earnings_batches WHERE id=b) IS NOT NULL THEN RAISE EXCEPTION 'Investigation bypassed'; END IF; checks:=array_append(checks,'elapsed hold cannot bypass investigation');
+UPDATE public.publisher_earnings_batches SET investigation_open=false WHERE id=b;
+PERFORM public.payment_tick(); PERFORM public.payment_tick(); IF (SELECT count(*) FROM public.publisher_payment_events WHERE batch_id=b AND kind='finalized')<>1 THEN RAISE EXCEPTION 'Finalization duplicated'; END IF; checks:=array_append(checks,'idempotent finalization');
+PERFORM public.payment_operate(u,'request_payout',jsonb_build_object('amount','50','key','rollback-payout-test','reason','test'));
+SELECT id INTO pay FROM public.payments WHERE idempotency_key='rollback-payout-test';
+PERFORM public.payment_operate(u,'request_payout',jsonb_build_object('amount','50','key','rollback-payout-test','reason','test'));
+IF (SELECT count(*) FROM public.payments WHERE idempotency_key='rollback-payout-test')<>1 THEN RAISE EXCEPTION 'Duplicate payout'; END IF; checks:=array_append(checks,'50 USD payout and duplicate prevention');
+failed:=false; BEGIN PERFORM public.payment_operate(u,'request_payout',jsonb_build_object('amount','49.99','key',gen_random_uuid(),'reason','test')); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION 'Below minimum accepted'; END IF; checks:=array_append(checks,'49.99 USD below minimum rejected');
+PERFORM public.payment_operate(u,'payment_approve',jsonb_build_object('payment_id',pay,'reason','test'));
+PERFORM public.payment_operate(u,'payment_release',jsonb_build_object('payment_id',pay,'reason','test'));
+failed:=false; BEGIN PERFORM public.payment_operate(u,'payment_paid',jsonb_build_object('payment_id',pay,'reason','test','reference','test','confirmed',false)); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION 'Unconfirmed payment accepted'; END IF; checks:=array_append(checks,'actual confirmation required');
+PERFORM public.payment_operate(u,'payment_failed',jsonb_build_object('payment_id',pay,'reason','test'));
+result:=public.payment_balances(u);
+PERFORM public.payment_operate(u,'payment_reconcile',jsonb_build_object('payment_id',pay,'reason','test'));
+IF (public.payment_balances(u)->>'finalized')::numeric-(result->>'finalized')::numeric<>50 THEN RAISE EXCEPTION 'Failed payment not returned exactly once'; END IF; checks:=array_append(checks,'failed payment returns 50 after reconciliation');
+failed:=false; BEGIN PERFORM public.payment_operate(u,'payment_reconcile',jsonb_build_object('payment_id',pay,'reason','test')); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION 'Double reconciliation'; END IF; checks:=array_append(checks,'duplicate reconciliation rejected');
+failed:=false; BEGIN PERFORM public.payment_operate(other,'adjustment',jsonb_build_object('batch_id',b,'amount','1','reason','test')); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF public.has_role(other,'admin') THEN checks:=array_append(checks,'permission test needs non-admin profile'); ELSIF NOT failed THEN RAISE EXCEPTION 'Publisher admin operation allowed'; ELSE checks:=array_append(checks,'publisher admin operation denied'); END IF;
+failed:=false; BEGIN PERFORM public.payment_operate(other,'appeal',jsonb_build_object('adjustment_id',a,'reason','test')); EXCEPTION WHEN OTHERS THEN failed:=true; END; IF NOT failed THEN RAISE EXCEPTION 'Cross publisher adjustment accessible'; END IF; checks:=array_append(checks,'cross publisher adjustment blocked');
+PERFORM public.payment_operate(u,'accept_policy',jsonb_build_object('version',original_policy.version,'accepted',true)); PERFORM public.payment_operate(u,'accept_policy',jsonb_build_object('version',original_policy.version,'accepted',true)); IF (SELECT count(*) FROM public.publisher_policy_acceptances WHERE user_id=u AND version=original_policy.version)<>1 THEN RAISE EXCEPTION 'Repeated acknowledgement duplicated'; END IF; checks:=array_append(checks,'policy acknowledgement idempotent');
+result:=jsonb_build_object('passed',checks,'rollback_only',true);
+RAISE SQLSTATE 'P9901' USING MESSAGE='Rollback successful regression fixtures';
+EXCEPTION WHEN SQLSTATE 'P9901' THEN RETURN result;
+END;
+END $$;
+REVOKE ALL ON FUNCTION public.payment_regression_tests() FROM PUBLIC,anon,authenticated; GRANT EXECUTE ON FUNCTION public.payment_regression_tests() TO service_role;
