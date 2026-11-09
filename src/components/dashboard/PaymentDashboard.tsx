@@ -82,7 +82,7 @@ export function PaymentDashboard({ admin = false }: { admin?: boolean }) {
   const [confirmed, setConfirmed] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   function open(a: Action) {
-    setAction(a);
+    setAction({ ...a, payload: { ...a.payload, key: a.payload.key ?? crypto.randomUUID() } });
     setValues({
       reason: "",
       ...Object.fromEntries(

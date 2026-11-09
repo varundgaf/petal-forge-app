@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import type { PaymentSnapshot } from "./payment-types";
+import { validatePayoutAmount } from "./payments/amount";
 
 export const getPaymentSnapshot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -40,6 +41,13 @@ export const paymentOperation = createServerFn({ method: "POST" })
       if (role.error || !role.data) throw new Error("Admin access required");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (["request_payout", "admin_request_payout"].includes(data.operation)) {
+      const userId = data.operation === "request_payout" ? context.userId : z.string().uuid().parse(data.payload.user_id);
+      const snapshot = await supabaseAdmin.rpc("payment_snapshot", { u: userId, all_publishers: false });
+      if (snapshot.error) throw new Error(snapshot.error.message);
+      const state = snapshot.data as unknown as PaymentSnapshot;
+      validatePayoutAmount(z.string().parse(data.payload.amount), String(state.policy.minimum), String(state.balances.available));
+    }
     const { data: result, error } = await supabaseAdmin.rpc("payment_operate", {
       actor: context.userId,
       operation: data.operation,
