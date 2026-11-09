@@ -352,13 +352,21 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          confirmed_at: string | null
           created_at: string
           destination: string | null
+          earnings_period_end: string | null
+          earnings_period_start: string | null
+          hold_reason: string | null
           id: string
+          idempotency_key: string | null
           invoice_url: string | null
+          ledger_managed: boolean
+          lifecycle_status: string | null
           method: Database["public"]["Enums"]["payment_method"]
           notes: string | null
           paid_at: string | null
+          reconciled_at: string | null
           reference_id: string | null
           requested_at: string
           status: Database["public"]["Enums"]["payment_status"]
@@ -368,13 +376,21 @@ export type Database = {
         }
         Insert: {
           amount: number
+          confirmed_at?: string | null
           created_at?: string
           destination?: string | null
+          earnings_period_end?: string | null
+          earnings_period_start?: string | null
+          hold_reason?: string | null
           id?: string
+          idempotency_key?: string | null
           invoice_url?: string | null
+          ledger_managed?: boolean
+          lifecycle_status?: string | null
           method: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           paid_at?: string | null
+          reconciled_at?: string | null
           reference_id?: string | null
           requested_at?: string
           status?: Database["public"]["Enums"]["payment_status"]
@@ -384,13 +400,21 @@ export type Database = {
         }
         Update: {
           amount?: number
+          confirmed_at?: string | null
           created_at?: string
           destination?: string | null
+          earnings_period_end?: string | null
+          earnings_period_start?: string | null
+          hold_reason?: string | null
           id?: string
+          idempotency_key?: string | null
           invoice_url?: string | null
+          ledger_managed?: boolean
+          lifecycle_status?: string | null
           method?: Database["public"]["Enums"]["payment_method"]
           notes?: string | null
           paid_at?: string | null
+          reconciled_at?: string | null
           reference_id?: string | null
           requested_at?: string
           status?: Database["public"]["Enums"]["payment_status"]
@@ -517,6 +541,54 @@ export type Database = {
         }
         Relationships: []
       }
+      publisher_adjustment_appeals: {
+        Row: {
+          adjustment_id: string
+          created_at: string
+          id: string
+          reason: string
+          resolution: string | null
+          resolved_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          adjustment_id: string
+          created_at?: string
+          id?: string
+          reason: string
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          adjustment_id?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_adjustment_appeals_adjustment_id_fkey"
+            columns: ["adjustment_id"]
+            isOneToOne: true
+            referencedRelation: "publisher_earnings_adjustments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publisher_adjustment_appeals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       publisher_earnings: {
         Row: {
           created_at: string
@@ -561,6 +633,331 @@ export type Database = {
           },
           {
             foreignKeyName: "publisher_earnings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publisher_earnings_adjustments: {
+        Row: {
+          amount: number
+          batch_id: string
+          created_at: string
+          created_by: string
+          evidence: string
+          evidence_key: string
+          id: string
+          reason: string
+          reversed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          batch_id: string
+          created_at?: string
+          created_by: string
+          evidence: string
+          evidence_key: string
+          id?: string
+          reason: string
+          reversed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          batch_id?: string
+          created_at?: string
+          created_by?: string
+          evidence?: string
+          evidence_key?: string
+          id?: string
+          reason?: string
+          reversed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_earnings_adjustments_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "publisher_earnings_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publisher_earnings_adjustments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publisher_earnings_batches: {
+        Row: {
+          adjustment: number
+          approved: boolean
+          created_at: string
+          finalized_at: string | null
+          gross: number
+          id: string
+          investigation_open: boolean
+          net: number | null
+          period_end: string
+          period_start: string
+          reconciliation_open: boolean
+          source: string
+          status: string
+          user_id: string
+          verification_ends_at: string
+          verification_started_at: string
+        }
+        Insert: {
+          adjustment?: number
+          approved?: boolean
+          created_at?: string
+          finalized_at?: string | null
+          gross: number
+          id?: string
+          investigation_open?: boolean
+          net?: number | null
+          period_end: string
+          period_start: string
+          reconciliation_open?: boolean
+          source: string
+          status?: string
+          user_id: string
+          verification_ends_at: string
+          verification_started_at?: string
+        }
+        Update: {
+          adjustment?: number
+          approved?: boolean
+          created_at?: string
+          finalized_at?: string | null
+          gross?: number
+          id?: string
+          investigation_open?: boolean
+          net?: number | null
+          period_end?: string
+          period_start?: string
+          reconciliation_open?: boolean
+          source?: string
+          status?: string
+          user_id?: string
+          verification_ends_at?: string
+          verification_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_earnings_batches_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publisher_payment_accounts: {
+        Row: {
+          destination: string | null
+          method: Database["public"]["Enums"]["payment_method"] | null
+          on_hold: boolean
+          reason: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          destination?: string | null
+          method?: Database["public"]["Enums"]["payment_method"] | null
+          on_hold?: boolean
+          reason?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          destination?: string | null
+          method?: Database["public"]["Enums"]["payment_method"] | null
+          on_hold?: boolean
+          reason?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_payment_accounts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publisher_payment_events: {
+        Row: {
+          actor_id: string | null
+          amount: number
+          batch_id: string | null
+          created_at: string
+          id: string
+          idempotency_key: string
+          kind: string
+          payment_id: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          amount?: number
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          kind: string
+          payment_id?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          amount?: number
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          kind?: string
+          payment_id?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_payment_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "publisher_earnings_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publisher_payment_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publisher_payment_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publisher_payment_policy: {
+        Row: {
+          effective_at: string
+          hour_utc: number
+          id: boolean
+          minimum: number
+          verification_days: number
+          version: number
+          weekday: number
+        }
+        Insert: {
+          effective_at?: string
+          hour_utc?: number
+          id?: boolean
+          minimum?: number
+          verification_days?: number
+          version?: number
+          weekday?: number
+        }
+        Update: {
+          effective_at?: string
+          hour_utc?: number
+          id?: boolean
+          minimum?: number
+          verification_days?: number
+          version?: number
+          weekday?: number
+        }
+        Relationships: []
+      }
+      publisher_policy_acceptances: {
+        Row: {
+          accepted_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          accepted_at?: string
+          user_id: string
+          version: number
+        }
+        Update: {
+          accepted_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_policy_acceptances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publisher_quality_reports: {
+        Row: {
+          batch_id: string
+          created_at: string
+          evidence: string | null
+          id: string
+          impressions: number
+          invalid_impressions: number
+          status: string
+          user_id: string
+          validated_impressions: number
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          impressions?: number
+          invalid_impressions?: number
+          status?: string
+          user_id: string
+          validated_impressions?: number
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          impressions?: number
+          invalid_impressions?: number
+          status?: string
+          user_id?: string
+          validated_impressions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_quality_reports_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "publisher_earnings_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publisher_quality_reports_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
