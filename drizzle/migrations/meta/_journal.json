@@ -57,6 +57,13 @@
       "when": 1794247677760,
       "tag": "0007_fix_financial_ingest_alias",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794247816890,
+      "tag": "0008_payment_hold_release_and_reconciliation",
+      "breakpoints": true
     }
   ]
 }

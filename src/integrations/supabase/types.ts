@@ -1334,6 +1334,10 @@ export type Database = {
         Args: { actor: string; d: Json; operation: string }
         Returns: Json
       }
+      payment_operate_core: {
+        Args: { actor: string; d: Json; operation: string }
+        Returns: Json
+      }
       payment_policy_current: {
         Args: never
         Returns: {
