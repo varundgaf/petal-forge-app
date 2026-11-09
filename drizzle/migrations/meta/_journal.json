@@ -50,6 +50,13 @@
       "when": 1794247639098,
       "tag": "0006_finance_regression_test_runner",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794247677760,
+      "tag": "0007_fix_financial_ingest_alias",
+      "breakpoints": true
     }
   ]
 }
