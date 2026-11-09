@@ -1352,6 +1352,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      payment_regression_tests: { Args: never; Returns: Json }
       payment_snapshot: {
         Args: { all_publishers?: boolean; u: string }
         Returns: Json

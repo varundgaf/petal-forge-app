@@ -43,6 +43,13 @@
       "when": 1794247560872,
       "tag": "0005_payment_financial_safeguards",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794247639098,
+      "tag": "0006_finance_regression_test_runner",
+      "breakpoints": true
     }
   ]
 }
