@@ -1330,6 +1330,10 @@ export type Database = {
         Args: { b: string; t: string; u: string }
         Returns: undefined
       }
+      payment_operate: {
+        Args: { actor: string; d: Json; operation: string }
+        Returns: Json
+      }
       payment_policy_current: {
         Args: never
         Returns: {
@@ -1347,6 +1351,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      payment_snapshot: {
+        Args: { all_publishers?: boolean; u: string }
+        Returns: Json
       }
       payment_tick: { Args: never; Returns: undefined }
       replace_smartlink_report: {
