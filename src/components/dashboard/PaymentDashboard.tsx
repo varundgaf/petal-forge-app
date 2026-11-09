@@ -434,6 +434,7 @@ export function PaymentDashboard({ admin = false }: { admin?: boolean }) {
                             {[
                               "payment_approve",
                               "payment_hold",
+                              "payment_unhold",
                               "payment_release",
                               "payment_paid",
                               "payment_failed",
@@ -563,7 +564,7 @@ export function PaymentDashboard({ admin = false }: { admin?: boolean }) {
                           <SelectValue placeholder="Review batch" />
                         </SelectTrigger>
                         <SelectContent>
-                          {["quality_review", "batch_approve", "batch_hold", "adjustment"].map(
+                          {["quality_review", "batch_approve", "batch_hold", "batch_reconcile", "adjustment"].map(
                             (v) => (
                               <SelectItem key={v} value={v}>
                                 {v.replaceAll("_", " ")}
