@@ -21,6 +21,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { PayoutMembership } from "@/components/dashboard/PayoutMembership";
 
 function download(name: string, content: string, type = "text/csv") {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -243,6 +244,7 @@ export function PaymentDashboard({ admin = false }: { admin?: boolean }) {
           </p>
         </Card>
       </div>
+      {!admin && <PayoutMembership />}
       {admin ? (
         <div className="flex flex-wrap gap-6 border-y border-border py-4 text-sm">
           <span>

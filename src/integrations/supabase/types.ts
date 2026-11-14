@@ -424,6 +424,56 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_membership_history: {
+        Row: {
+          activated_at: string
+          changed_by: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          membership_status: string
+          monthly_price: number
+          new_plan: string
+          previous_plan: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          activated_at: string
+          changed_by: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          membership_status: string
+          monthly_price: number
+          new_plan: string
+          previous_plan?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          changed_by?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          membership_status?: string
+          monthly_price?: number
+          new_plan?: string
+          previous_plan?: string | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_membership_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_settings: {
         Row: {
           key: string
@@ -888,6 +938,47 @@ export type Database = {
         }
         Relationships: []
       }
+      publisher_payout_memberships: {
+        Row: {
+          activated_at: string
+          expires_at: string | null
+          last_modified_by: string | null
+          membership_status: string
+          monthly_price: number
+          payout_plan: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          expires_at?: string | null
+          last_modified_by?: string | null
+          membership_status?: string
+          monthly_price?: number
+          payout_plan?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          expires_at?: string | null
+          last_modified_by?: string | null
+          membership_status?: string
+          monthly_price?: number
+          payout_plan?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publisher_payout_memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       publisher_policy_acceptances: {
         Row: {
           accepted_at: string
@@ -1317,6 +1408,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      change_payout_membership: {
+        Args: {
+          actor: string
+          change_reason?: string
+          ends: string
+          new_plan: string
+          starts: string
+          target: string
+        }
+        Returns: {
+          activated_at: string
+          expires_at: string | null
+          last_modified_by: string | null
+          membership_status: string
+          monthly_price: number
+          payout_plan: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "publisher_payout_memberships"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

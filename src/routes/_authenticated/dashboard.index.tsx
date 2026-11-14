@@ -39,6 +39,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { PayoutMembership } from "@/components/dashboard/PayoutMembership";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: OverviewPage,
@@ -342,6 +343,8 @@ function OverviewPage() {
           </ul>
         </div>
       )}
+
+      <PayoutMembership />
 
       {/* Revenue timeframes */}
       <section className="space-y-3">

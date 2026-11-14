@@ -147,7 +147,7 @@ export const getUserDetail = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [profile, roles, sites, payments, revenue, activity, notifications] = await Promise.all([
+    const [profile, roles, sites, payments, revenue, activity, notifications, membership, membershipHistory] = await Promise.all([
       supabaseAdmin.from("profiles").select("*").eq("id", data.userId).maybeSingle(),
       supabaseAdmin.from("user_roles").select("role").eq("user_id", data.userId),
       supabaseAdmin.from("sites").select("*").eq("user_id", data.userId).order("created_at", { ascending: false }),
@@ -155,8 +155,17 @@ export const getUserDetail = createServerFn({ method: "POST" })
       supabaseAdmin.from("revenue_events").select("date,revenue,impressions,clicks").eq("user_id", data.userId).order("date", { ascending: false }).limit(30),
       supabaseAdmin.from("activity_logs").select("*").eq("user_id", data.userId).order("created_at", { ascending: false }).limit(50),
       supabaseAdmin.from("notifications").select("*").eq("user_id", data.userId).order("created_at", { ascending: false }).limit(50),
+      supabaseAdmin.from("publisher_payout_memberships").select("*").eq("user_id", data.userId).maybeSingle(),
+      supabaseAdmin.from("payout_membership_history").select("*").eq("user_id", data.userId).order("created_at", { ascending: false }).limit(20),
     ]);
     if (profile.error) throw new Error(profile.error.message);
+    if (membership.error) throw new Error(membership.error.message);
+    if (membershipHistory.error) throw new Error(membershipHistory.error.message);
+    const adminIds = [...new Set((membershipHistory.data ?? []).map((row) => row.changed_by))];
+    const { data: admins } = adminIds.length
+      ? await supabaseAdmin.from("profiles").select("id,email,name").in("id", adminIds)
+      : { data: [] };
+    const adminMap = new Map((admins ?? []).map((admin) => [admin.id, admin]));
     return {
       profile: profile.data,
       roles: (roles.data ?? []).map((r) => r.role),
@@ -165,6 +174,11 @@ export const getUserDetail = createServerFn({ method: "POST" })
       revenue: revenue.data ?? [],
       activity: activity.data ?? [],
       notifications: notifications.data ?? [],
+      membership: membership.data,
+      membershipHistory: (membershipHistory.data ?? []).map((row) => ({
+        ...row,
+        changed_by_profile: adminMap.get(row.changed_by) ?? null,
+      })),
     };
   });
 

@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Trash2, KeyRound, ShieldOff, ShieldCheck, MailCheck } from "lucide-react";
+import { ArrowLeft, Save, Trash2, KeyRound, ShieldOff, ShieldCheck, MailCheck, Crown, History } from "lucide-react";
 import {
   getUserDetail,
   updateUser,
@@ -25,6 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { changePayoutMembership } from "@/lib/membership.functions";
+import { defaultMembership, getPayoutPlan, PAYOUT_PLANS, type PayoutPlanId } from "@/lib/payout-membership";
 
 export const Route = createFileRoute("/admin/_gated/users/$userId")({
   component: UserDetail,
@@ -40,6 +43,7 @@ function UserDetail() {
   const delFn = useServerFn(deleteUser);
   const pwFn = useServerFn(resetUserPassword);
   const verifyFn = useServerFn(verifyUserEmail);
+  const changePlanFn = useServerFn(changePayoutMembership);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "user", userId],
@@ -48,6 +52,13 @@ function UserDetail() {
 
   const [form, setForm] = useState<any>({});
   const [newPw, setNewPw] = useState("");
+  const [planOpen, setPlanOpen] = useState(false);
+  const [planForm, setPlanForm] = useState<{
+    plan: PayoutPlanId;
+    activationDate: string;
+    expiryDate: string;
+    reason: string;
+  }>({ plan: "net30", activationDate: "", expiryDate: "", reason: "" });
 
   useEffect(() => {
     if (data?.profile) setForm({ ...data.profile });
@@ -96,9 +107,42 @@ function UserDetail() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const changePlan = useMutation({
+    mutationFn: () =>
+      changePlanFn({
+        data: {
+          userId,
+          plan: planForm.plan,
+          activationDate: planForm.activationDate,
+          expiryDate: planForm.plan === "net30" ? null : planForm.expiryDate || null,
+          reason: planForm.reason,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Payout membership updated");
+      setPlanOpen(false);
+      qc.invalidateQueries({ queryKey: ["admin", "user", userId] });
+      qc.invalidateQueries({ queryKey: ["payout-membership", userId] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   if (isLoading || !data?.profile) return <div className="text-muted-foreground">Loading…</div>;
 
   const p = data.profile;
+  const membership = data.membership ?? defaultMembership(userId);
+  const membershipPlan = getPayoutPlan(membership.payout_plan);
+  const openPlanChange = () => {
+    setPlanForm({
+      plan: membership.payout_plan as PayoutPlanId,
+      activationDate: membership.activated_at.startsWith("1970-01-01")
+        ? new Date().toISOString().slice(0, 10)
+        : membership.activated_at.slice(0, 10),
+      expiryDate: membership.expires_at?.slice(0, 10) ?? "",
+      reason: "",
+    });
+    setPlanOpen(true);
+  };
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
   return (
@@ -153,6 +197,62 @@ function UserDetail() {
           </Button>
         </div>
       </div>
+
+      <Card className="border-primary/25 bg-card/40 p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="rounded-lg border border-primary/25 bg-primary/10 p-2 text-primary">
+              <Crown className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-semibold">Payout Membership</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Admin-assigned plan. No payment gateway or automatic subscription deduction.
+              </p>
+            </div>
+          </div>
+          <Button variant="hero" size="sm" onClick={openPlanChange}>
+            Change plan
+          </Button>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <MembershipDetail label="Current plan" value={`${membershipPlan.name} · ${membershipPlan.cycle}`} />
+          <MembershipDetail label="Monthly price" value={`₹${membershipPlan.monthlyPrice.toLocaleString("en-IN")}`} />
+          <MembershipDetail label="Status" value={membership.membership_status} />
+          <MembershipDetail label="Activated" value={new Date(membership.activated_at).toLocaleDateString()} />
+          <MembershipDetail
+            label="Expires"
+            value={membership.expires_at ? new Date(membership.expires_at).toLocaleDateString() : "No expiry"}
+          />
+        </div>
+        <div className="mt-5 border-t border-border/60 pt-4">
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <History className="h-3.5 w-3.5" /> Plan change history
+          </div>
+          {data.membershipHistory.length ? (
+            <ul className="space-y-3">
+              {data.membershipHistory.slice(0, 5).map((entry: any) => (
+                <li key={entry.id} className="flex flex-wrap items-start justify-between gap-2 text-sm">
+                  <div>
+                    <p>
+                      <span className="capitalize text-muted-foreground">{entry.previous_plan ?? "Not assigned"}</span>
+                      {" → "}
+                      <span className="font-medium uppercase">{entry.new_plan}</span>
+                      <span className="text-muted-foreground">
+                        {" · by "}{entry.changed_by_profile?.name ?? entry.changed_by_profile?.email ?? "Admin"}
+                      </span>
+                    </p>
+                    {entry.reason && <p className="mt-1 text-xs text-muted-foreground">{entry.reason}</p>}
+                  </div>
+                  <span className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">No manual plan changes yet.</p>
+          )}
+        </div>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="border-border/60 bg-card/40 p-5 lg:col-span-2">
@@ -361,6 +461,89 @@ function UserDetail() {
           </Card>
         </div>
       </div>
+
+      <Dialog open={planOpen} onOpenChange={setPlanOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change payout membership</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="mb-1.5 block text-xs">Membership plan</Label>
+              <Select
+                value={planForm.plan}
+                onValueChange={(plan) => setPlanForm((current) => ({ ...current, plan: plan as PayoutPlanId }))}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {PAYOUT_PLANS.map((plan) => (
+                    <SelectItem key={plan.id} value={plan.id}>
+                      {plan.name} · {plan.cycle} · ₹{plan.monthlyPrice}/month
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label className="mb-1.5 block text-xs">Activation date</Label>
+                <Input
+                  type="date"
+                  value={planForm.activationDate}
+                  onChange={(event) => setPlanForm((current) => ({ ...current, activationDate: event.target.value }))}
+                />
+              </div>
+              {planForm.plan !== "net30" && (
+                <div>
+                  <Label className="mb-1.5 block text-xs">Expiry date (optional)</Label>
+                  <Input
+                    type="date"
+                    value={planForm.expiryDate}
+                    onChange={(event) => setPlanForm((current) => ({ ...current, expiryDate: event.target.value }))}
+                  />
+                </div>
+              )}
+            </div>
+            <div>
+              <Label className="mb-1.5 block text-xs">Internal reason (optional)</Label>
+              <Textarea
+                rows={3}
+                value={planForm.reason}
+                onChange={(event) => setPlanForm((current) => ({ ...current, reason: event.target.value }))}
+                placeholder="Reason for this upgrade, downgrade or date change"
+              />
+            </div>
+            <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
+              Confirm change from <strong>{membershipPlan.name} ({membershipPlan.cycle})</strong> to{" "}
+              <strong>{getPayoutPlan(planForm.plan).name} ({getPayoutPlan(planForm.plan).cycle})</strong>.
+              No charge or subscription deduction will be made.
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setPlanOpen(false)}>Cancel</Button>
+              <Button
+                variant="hero"
+                onClick={() => changePlan.mutate()}
+                disabled={
+                  changePlan.isPending ||
+                  !planForm.activationDate ||
+                  Boolean(planForm.expiryDate && planForm.expiryDate <= planForm.activationDate)
+                }
+              >
+                {changePlan.isPending ? "Saving…" : "Confirm plan change"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function MembershipDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-1.5 text-sm font-medium capitalize">{value}</p>
     </div>
   );
 }

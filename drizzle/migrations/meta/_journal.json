@@ -64,6 +64,13 @@
       "when": 1794247816890,
       "tag": "0008_payment_hold_release_and_reconciliation",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794658588570,
+      "tag": "0009_add_payout_membership_plans",
+      "breakpoints": true
     }
   ]
 }
