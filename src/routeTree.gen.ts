@@ -48,6 +48,7 @@ import { Route as AdminGatedSitesRouteImport } from './routes/admin/_gated/sites
 import { Route as AdminGatedSupportRouteImport } from './routes/admin/_gated/support'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
 import { Route as ApiPublicSmartlinksSyncRouteImport } from './routes/api/public/smartlinks-sync'
+import { Route as AdminGatedUsersIndexRouteImport } from './routes/admin/_gated/users.index'
 import { Route as AdminGatedUsersUserIdRouteImport } from './routes/admin/_gated/users.$userId'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -253,6 +254,11 @@ const ApiPublicSmartlinksSyncRoute = ApiPublicSmartlinksSyncRouteImport.update({
   path: '/api/public/smartlinks-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminGatedUsersIndexRoute = AdminGatedUsersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminGatedUsersRoute,
+} as any)
 const AdminGatedUsersUserIdRoute = AdminGatedUsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -310,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/admin/users/': typeof AdminGatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -344,12 +351,12 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminGatedSettingsRoute
   '/admin/sites': typeof AdminGatedSitesRoute
   '/admin/support': typeof AdminGatedSupportRoute
-  '/admin/users': typeof AdminGatedUsersRouteWithChildren
   '/api/public/smartlinks-sync': typeof ApiPublicSmartlinksSyncRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/admin/users/$userId': typeof AdminGatedUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/admin/users': typeof AdminGatedUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -395,6 +402,7 @@ export interface FileRoutesById {
   '/admin/_gated/users/$userId': typeof AdminGatedUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/admin/_gated/users/': typeof AdminGatedUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -439,6 +447,7 @@ export interface FileRouteTypes {
     | '/admin/users/$userId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
+    | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -473,12 +482,12 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/sites'
     | '/admin/support'
-    | '/admin/users'
     | '/api/public/smartlinks-sync'
     | '/dashboard'
     | '/admin/users/$userId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
@@ -523,6 +532,7 @@ export interface FileRouteTypes {
     | '/admin/_gated/users/$userId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
+    | '/admin/_gated/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -821,6 +831,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSmartlinksSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/_gated/users/': {
+      id: '/admin/_gated/users/'
+      path: '/'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminGatedUsersIndexRouteImport
+      parentRoute: typeof AdminGatedUsersRoute
+    }
     '/admin/_gated/users/$userId': {
       id: '/admin/_gated/users/$userId'
       path: '/$userId'
@@ -888,10 +905,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface AdminGatedUsersRouteChildren {
   AdminGatedUsersUserIdRoute: typeof AdminGatedUsersUserIdRoute
+  AdminGatedUsersIndexRoute: typeof AdminGatedUsersIndexRoute
 }
 
 const AdminGatedUsersRouteChildren: AdminGatedUsersRouteChildren = {
   AdminGatedUsersUserIdRoute: AdminGatedUsersUserIdRoute,
+  AdminGatedUsersIndexRoute: AdminGatedUsersIndexRoute,
 }
 
 const AdminGatedUsersRouteWithChildren = AdminGatedUsersRoute._addFileChildren(
